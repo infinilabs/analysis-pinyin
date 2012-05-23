@@ -15,8 +15,27 @@ In order to install the plugin, simply run: `bin/plugin -install medcl/elasticse
     | 1.1.0                         | 0.19 -> master |
     --------------------------------------------------
 
-The plugin includes the `pinyin` analyzer, `pinyin` tokenizer, and `pinyin` token filter.
+The plugin includes the `pinyin` analyzer and `pinyin` tokenizer.
 
-1.是否移除空格
-2.是否只返回拼音首字母
-3.是否只处理中文
+
+{
+    "index" : {
+        "analysis" : {
+            "analyzer" : {
+                "pinyin_analyzer" : {
+                    "tokenizer" : "my_pinyin",
+                    "filter" : ["standard", "whitespace"]
+                }
+            },
+            "tokenizer" : {
+                "my_pinyin" : {
+                    "type" : "pinyin",
+                    "only_first_letter" : false,
+                    "padding_char" : " "
+                }
+            }
+        }
+    }
+}
+
+

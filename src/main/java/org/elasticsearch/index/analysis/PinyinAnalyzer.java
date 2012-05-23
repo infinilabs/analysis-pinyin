@@ -3,6 +3,7 @@ package org.elasticsearch.index.analysis;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.elasticsearch.common.settings.Settings;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -14,9 +15,24 @@ import java.io.Reader;
  * Time: 上午10:39
  */
 public final class PinyinAnalyzer extends Analyzer {
+
+
+    private String padding_char;
+    private String only_first_letter;
+
+
+    public PinyinAnalyzer(Settings settings) {
+       only_first_letter = settings.get("only_first_letter", "false");
+       padding_char = settings.get("padding_char", "");
+    }
+
     @Override
     public TokenStream tokenStream(String fieldName, Reader reader) {
-        return new PinyinTokenizer(reader);
+          if(only_first_letter.equals("false")){
+            return new PinyinTokenizer(reader,padding_char);
+        }else{
+            return new PinyinAbbreviationsTokenizer(reader);
+        }
     }
     @Override
     public TokenStream reusableTokenStream(String fieldName,Reader reader) throws IOException {
@@ -25,7 +41,7 @@ public final class PinyinAnalyzer extends Analyzer {
     Tokenizer tokenizer = (Tokenizer) getPreviousTokenStream();
 
     if (tokenizer == null) {
-      tokenizer = new PinyinTokenizer(reader);
+      tokenizer = new PinyinTokenizer(reader,padding_char);
       setPreviousTokenStream(tokenizer);
     } else
     {

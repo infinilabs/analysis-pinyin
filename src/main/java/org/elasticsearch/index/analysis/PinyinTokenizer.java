@@ -31,9 +31,11 @@ public class PinyinTokenizer extends Tokenizer {
     private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
     private static Pattern pattern = Pattern.compile("^[\\u4e00-\\u9fa5]$");
+    private String padding_char;
 
-    public PinyinTokenizer(Reader reader) {
+    public PinyinTokenizer(Reader reader,String padding_char) {
         this(reader, DEFAULT_BUFFER_SIZE);
+         this.padding_char = padding_char;
     }
 
     public PinyinTokenizer(Reader input, int bufferSize) {
@@ -71,8 +73,11 @@ public class PinyinTokenizer extends Tokenizer {
 
                         String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
                         if (strs != null) {
-                            termAtt.append(strs[0]);
-//                            termAtt.append(" "); //TODO splitter
+                            termAtt.append(strs[0]);   //get first result by default
+                            if(this.padding_char.length()>0)
+                            {
+                                termAtt.append(this.padding_char); //TODO splitter
+                            }
                             //TODO more than one pinyin
                         }
                     } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {

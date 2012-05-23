@@ -70,7 +70,7 @@ public class PinyinAnalysisTests {
             System.out.println(value);
             StringReader sr = new StringReader(value);
 
-            PinyinTokenizer tokenizer = new PinyinTokenizer(sr);
+            PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ");
 //            PinyinAbbreviationsTokenizer tokenizer = new PinyinAbbreviationsTokenizer(sr);
 
             boolean hasnext = tokenizer.incrementToken();
