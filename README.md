@@ -68,6 +68,9 @@ also   `first_letter`  to `append`
 {"tokens":[{"token":"liu de hua ldh","start_offset":0,"end_offset":3,"type":"word","position":1}]}
 </pre>
 
+
+-------additional----------example-----------------------
+
 if you wanna do a auto-complete with people's name,combining with the magic of pinyin,and it's very easy now,here is the detail instructions:
 1.Index setting
 <pre>
