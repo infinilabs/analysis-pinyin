@@ -8,7 +8,6 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import org.apache.lucene.analysis.CharTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 
 import java.io.Reader;
 import java.util.regex.Matcher;
@@ -18,10 +17,7 @@ public class PinyinAbbreviationsTokenizer extends CharTokenizer {
 
     private static final int DEFAULT_BUFFER_SIZE = 256;
 
-    private boolean done = false;
-    private int finalOffset;
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-    private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
     private static Pattern pattern = Pattern.compile("^[\\u4e00-\\u9fa5]$");
 

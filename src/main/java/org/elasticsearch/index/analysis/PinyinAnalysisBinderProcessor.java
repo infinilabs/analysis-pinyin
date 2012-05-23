@@ -31,10 +31,11 @@ public class PinyinAnalysisBinderProcessor extends AnalysisModule.AnalysisBinder
     @Override
     public void processTokenizers(TokenizersBindings tokenizersBindings) {
         tokenizersBindings.processTokenizer("pinyin", PinyinTokenizerFactory.class);
+        tokenizersBindings.processTokenizer("pinyin_first_letter", PinyinAbbreviationsTokenizerFactory.class);
     }
 
     @Override
     public void processTokenFilters(TokenFiltersBindings tokenFiltersBindings) {
-        tokenFiltersBindings.processTokenFilter("pinyin", PinyinTokenFilterFactory.class);
+//        tokenFiltersBindings.processTokenFilter("pinyin", PinyinTokenFilterFactory.class);
     }
 }

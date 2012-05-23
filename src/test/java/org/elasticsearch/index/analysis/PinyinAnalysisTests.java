@@ -28,7 +28,6 @@ import org.elasticsearch.env.EnvironmentModule;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.IndexNameModule;
 import org.elasticsearch.index.settings.IndexSettingsModule;
-import org.elasticsearch.indices.analysis.IndicesAnalysisModule;
 import org.elasticsearch.indices.analysis.IndicesAnalysisService;
 import org.hamcrest.MatcherAssert;
 import org.testng.annotations.Test;
@@ -47,7 +46,7 @@ public class PinyinAnalysisTests {
     public void testPinyinAnalysis() {
         Index index = new Index("test");
 
-        Injector parentInjector = new ModulesBuilder().add(new SettingsModule(EMPTY_SETTINGS), new EnvironmentModule(new Environment(EMPTY_SETTINGS)), new IndicesAnalysisModule()).createInjector();
+        Injector parentInjector = new ModulesBuilder().add(new SettingsModule(EMPTY_SETTINGS), new EnvironmentModule(new Environment(EMPTY_SETTINGS))).createInjector();
         Injector injector = new ModulesBuilder().add(
                 new IndexSettingsModule(index, EMPTY_SETTINGS),
                 new IndexNameModule(index),
@@ -59,18 +58,19 @@ public class PinyinAnalysisTests {
         TokenizerFactory tokenizerFactory = analysisService.tokenizer("pinyin");
         MatcherAssert.assertThat(tokenizerFactory, instanceOf(PinyinTokenizerFactory.class));
 
-        TokenFilterFactory filterFactory = analysisService.tokenFilter("pinyin");
-        MatcherAssert.assertThat(filterFactory, instanceOf(PinyinTokenFilterFactory.class));
     }
 
     @Test
     public void TestTokenizer() throws IOException {
-        String[] s = {"刘德华", "劉德華","刘德华A1","刘德华A2"};
+        String[] s = {"刘德华", "劉德華", "刘德华A1", "刘德华A2"};
         for (String value : s) {
             System.out.println(value);
             StringReader sr = new StringReader(value);
 
-            PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ");
+            PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ","none");
+//            PinyinTokenizer tokenizer = new PinyinTokenizer(sr, " ", "only");
+//            PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ","prefix");
+//              PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ","append");
 //            PinyinAbbreviationsTokenizer tokenizer = new PinyinAbbreviationsTokenizer(sr);
 
             boolean hasnext = tokenizer.incrementToken();

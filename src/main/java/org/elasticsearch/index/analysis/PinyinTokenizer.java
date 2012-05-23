@@ -12,8 +12,6 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,12 +28,13 @@ public class PinyinTokenizer extends Tokenizer {
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-    private static Pattern pattern = Pattern.compile("^[\\u4e00-\\u9fa5]$");
     private String padding_char;
+    private String first_letter;
 
-    public PinyinTokenizer(Reader reader,String padding_char) {
+    public PinyinTokenizer(Reader reader, String padding_char, String first_letter) {
         this(reader, DEFAULT_BUFFER_SIZE);
-         this.padding_char = padding_char;
+        this.padding_char = padding_char;
+        this.first_letter = first_letter;
     }
 
     public PinyinTokenizer(Reader input, int bufferSize) {
@@ -63,28 +62,55 @@ public class PinyinTokenizer extends Tokenizer {
             termAtt.setLength(upto);
             String str = termAtt.toString();
             termAtt.setEmpty();
+            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder firstLetters = new StringBuilder();
             for (int i = 0; i < str.length(); i++) {
                 char c = str.charAt(i);
-                Matcher matcher = pattern.matcher(String.valueOf(c));
-                if (!matcher.matches()) {
-                    termAtt.append(c);
+                if (c < 128) {
+                    stringBuilder.append(c);
                 } else {
                     try {
-
                         String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
                         if (strs != null) {
-                            termAtt.append(strs[0]);   //get first result by default
-                            if(this.padding_char.length()>0)
-                            {
-                                termAtt.append(this.padding_char); //TODO splitter
-                            }
+                            //get first result by default
+                            String first_value = strs[0];
                             //TODO more than one pinyin
+                            stringBuilder.append(first_value);
+                            if (this.padding_char.length() > 0) {
+                                stringBuilder.append(this.padding_char);
+                            }
+                            firstLetters.append(first_value.charAt(0));
+
                         }
                     } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
                         badHanyuPinyinOutputFormatCombination.printStackTrace();
                     }
                 }
             }
+
+            //let's join them
+            if (first_letter.equals("prefix")) {
+                termAtt.append(firstLetters.toString());
+                if (this.padding_char.length() > 0) {
+                    termAtt.append(this.padding_char); //TODO splitter
+                }
+                termAtt.append(stringBuilder.toString());
+            } else if (first_letter.equals("append")) {
+                termAtt.append(stringBuilder.toString());
+                if (this.padding_char.length() > 0) {
+                    if(!stringBuilder.toString().endsWith(this.padding_char))
+                    {
+                        termAtt.append(this.padding_char);
+                    }
+                }
+                termAtt.append(firstLetters.toString());
+            } else if (first_letter.equals("none")) {
+                termAtt.append(stringBuilder.toString());
+            } else if (first_letter.equals("only")) {
+                termAtt.append(firstLetters.toString());
+            }
+
+
             finalOffset = correctOffset(upto);
             offsetAtt.setOffset(correctOffset(0), finalOffset);
             return true;
