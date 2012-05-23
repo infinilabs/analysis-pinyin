@@ -69,9 +69,11 @@ also   `first_letter`  to `append`
 </pre>
 
 
--------additional----------example-----------------------
+
+----------additional----------example-----------------------
 
 if you wanna do a auto-complete with people's name,combining with the magic of pinyin,and it's very easy now,here is the detail instructions:
+
 1.Index setting
 <pre>
 curl -XPOST http://localhost:9200/medcl/_close
