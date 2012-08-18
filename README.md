@@ -97,7 +97,7 @@ curl -XPUT http://localhost:9200/medcl/_settings -d'
         }
     }
 }'
-curl -XPOST http://localhost:9200/medcl/_close
+curl -XPOST http://localhost:9200/medcl/_open
 </pre>
 
 2.Create mapping
