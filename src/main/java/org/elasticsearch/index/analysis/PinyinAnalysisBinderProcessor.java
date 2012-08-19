@@ -36,6 +36,6 @@ public class PinyinAnalysisBinderProcessor extends AnalysisModule.AnalysisBinder
 
     @Override
     public void processTokenFilters(TokenFiltersBindings tokenFiltersBindings) {
-//        tokenFiltersBindings.processTokenFilter("pinyin", PinyinTokenFilterFactory.class);
+        tokenFiltersBindings.processTokenFilter("pinyin", PinyinTokenFilterFactory.class);
     }
 }
