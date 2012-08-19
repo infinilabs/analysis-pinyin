@@ -19,7 +19,12 @@
 
 package org.elasticsearch.index.analysis;
 
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+import junit.framework.Assert;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.util.Version;
 import org.elasticsearch.common.inject.Injector;
 import org.elasticsearch.common.inject.ModulesBuilder;
 import org.elasticsearch.common.settings.SettingsModule;
@@ -34,6 +39,8 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.elasticsearch.common.settings.ImmutableSettings.Builder.EMPTY_SETTINGS;
 import static org.hamcrest.Matchers.instanceOf;
@@ -58,6 +65,38 @@ public class PinyinAnalysisTests {
         TokenizerFactory tokenizerFactory = analysisService.tokenizer("pinyin");
         MatcherAssert.assertThat(tokenizerFactory, instanceOf(PinyinTokenizerFactory.class));
 
+        TokenFilterFactory tokenFilterFactory = analysisService.tokenFilter("pinyin");
+        MatcherAssert.assertThat(tokenFilterFactory,instanceOf(PinyinTokenFilterFactory.class));
+
+    }
+
+    @Test
+    public void testTokenFilter() throws IOException{
+        StringReader sr = new StringReader("刘德华");
+        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_36);
+        PinyinTokenFilter filter = new PinyinTokenFilter(analyzer.tokenStream("f",sr),"","none");
+        List<String>  pinyin= new ArrayList<String>();
+        while (filter.incrementToken())
+        {
+            CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
+            pinyin.add(ta.toString());
+        }
+        Assert.assertEquals(3,pinyin.size());
+        Assert.assertEquals("liu",pinyin.get(0));
+        Assert.assertEquals("de",pinyin.get(1));
+        Assert.assertEquals("hua",pinyin.get(2));
+
+        sr = new StringReader("刘德华");
+        analyzer = new KeywordAnalyzer();
+        filter = new PinyinTokenFilter(analyzer.tokenStream("f",sr),"","only");
+        pinyin.clear();
+        while (filter.incrementToken())
+        {
+            CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
+            pinyin.add(ta.toString());
+        }
+        Assert.assertEquals(1,pinyin.size());
+        Assert.assertEquals("ldh",pinyin.get(0));
     }
 
     @Test
@@ -77,9 +116,9 @@ public class PinyinAnalysisTests {
 
             while (hasnext) {
 
-                TermAttribute ta = tokenizer.getAttribute(TermAttribute.class);
+                CharTermAttribute ta = tokenizer.getAttribute(CharTermAttribute.class);
 
-                System.out.println(ta.term());
+                System.out.println(ta.toString());
 
                 hasnext = tokenizer.incrementToken();
 
