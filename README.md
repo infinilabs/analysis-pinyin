@@ -5,17 +5,19 @@ The Pinyin Analysis plugin integrates Pinyin4j(http://pinyin4j.sourceforge.net/)
 
 Pinyin4j is a popular Java library supporting convertion between Chinese characters and most popular Pinyin systems. The output format of pinyin could be customized.
 
-In order to install the plugin, simply run: `bin/plugin -install medcl/elasticsearch-analysis-pinyin/1.1.0`.
+In order to install the plugin, simply run: `bin/plugin -install medcl/elasticsearch-analysis-pinyin/1.1.1`.
 
     --------------------------------------------------
     | Pinyin4j   Analysis Plugin    | ElasticSearch  |
     --------------------------------------------------
     | master                        | 0.19 -> master |
     --------------------------------------------------
+    | 1.1.1                         | 0.19.8->master |
+    --------------------------------------------------
     | 1.1.0                         | 0.19 -> master |
     --------------------------------------------------
 
-The plugin includes a `pinyin` analyzer and two tokenizer: `pinyin` and `pinyin_first_letter`.
+The plugin includes a `pinyin` analyzer , two tokenizer: `pinyin`  `pinyin_first_letter` and a token-filter:  `pinyin` .
 
 1.Create a index for doing some tests
 <pre>
@@ -140,4 +142,34 @@ curl http://localhost:9200/medcl/folks/_search?q=name:%e5%88%98%e5%be%b7
 curl http://localhost:9200/medcl/folks/_search?q=name:liu
 curl http://localhost:9200/medcl/folks/_search?q=name:ldh
 curl http://localhost:9200/medcl/folks/_search?q=name:dehua
+</pre>
+
+5.Use Pinyin-TokenFilter (contributed by @wangweiwei)
+<pre>
+curl -XPUT http://localhost:9200/medcl1/ -d'
+{
+    "index" : {
+        "analysis" : {
+            "analyzer" : {
+                "user_name_analyzer" : {
+                    "tokenizer" : "whitespace",
+                    "filter" : ["standard","pinyin_filter"]
+                }
+            },
+            "filter" : {
+                "pinyin_filter" : {
+                    "type" : "pinyin",
+                    "first_letter" : "only",
+                    "padding_char" : ""
+                }
+            }
+        }
+    }
+}'
+</pre>
+
+Token Test:刘德华 张学友 郭富城 黎明 四大天王
+<pre>
+curl -XGET http://localhost:9200/medcl/_analyze?text=%e5%88%98%e5%be%b7%e5%8d%8e+%e5%bc%a0%e5%ad%a6%e5%8f%8b+%e9%83%ad%e5%af%8c%e5%9f%8e+%e9%bb%8e%e6%98%8e+%e5%9b%9b%e5%a4%a7%e5%a4%a9%e7%8e%8b&analyzer=user_name_analyzer
+{"tokens":[{"token":"ldh","start_offset":0,"end_offset":3,"type":"word","position":1},{"token":"zxy","start_offset":4,"end_offset":7,"type":"word","position":2},{"token":"gfc","start_offset":8,"end_offset":11,"type":"word","position":3},{"token":"lm","start_offset":12,"end_offset":14,"type":"word","position":4},{"token":"sdtw","start_offset":15,"end_offset":19,"type":"word","position":5}]}
 </pre>
