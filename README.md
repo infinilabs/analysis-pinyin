@@ -5,18 +5,20 @@ The Pinyin Analysis plugin integrates Pinyin4j(http://pinyin4j.sourceforge.net/)
 
 Pinyin4j is a popular Java library supporting convertion between Chinese characters and most popular Pinyin systems. The output format of pinyin could be customized.
 
-In order to install the plugin, simply run: `bin/plugin -install medcl/elasticsearch-analysis-pinyin/1.1.1`.
+you can download this plugin from RTF project(https://github.com/medcl/elasticsearch-rtf)
 
     --------------------------------------------------
     | Pinyin4j   Analysis Plugin    | ElasticSearch  |
     --------------------------------------------------
     | master                        | 0.20 -> master |
     --------------------------------------------------
-    | 1.1.2                         | 0.20.2->master |
+    | 1.2.0                         | 0.90.0         |
     --------------------------------------------------
-    | 1.1.1                         | 0.19.x->master |
+    | 1.1.2                         | 0.20.2         |
     --------------------------------------------------
-    | 1.1.0                         | 0.19 -> master |
+    | 1.1.1                         | 0.19.x         |
+    --------------------------------------------------
+    | 1.1.0                         | 0.19.0         |
     --------------------------------------------------
 
 The plugin includes a `pinyin` analyzer , two tokenizer: `pinyin`  `pinyin_first_letter` and a token-filter:  `pinyin` .

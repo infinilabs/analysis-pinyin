@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.elasticsearch</groupId>
     <artifactId>elasticsearch-analysis-pinyin</artifactId>
-    <version>1.1.2</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
     <description>Pinyin Analysis for ElasticSearch</description>
     <inceptionYear>2012</inceptionYear>
@@ -17,6 +17,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <scm>
         <connection>scm:git:git@github.com:medcl/elasticsearch-analysis-pinyin.git</connection>
         <developerConnection>scm:git:git@github.com:medcl/elasticsearch-analysis-pinyin.git
@@ -31,9 +32,8 @@
     </parent>
 
     <properties>
-        <elasticsearch.version>0.20.2</elasticsearch.version>
+        <elasticsearch.version>0.90.0</elasticsearch.version>
     </properties>
-
 
     <repositories>
         <repository>
@@ -50,13 +50,17 @@
     </repositories>
 
     <dependencies>
-
         <dependency>
             <groupId>net.sourceforge.pinyin4j</groupId>
             <artifactId>pinyin4j</artifactId>
             <version>2.5.0</version>
             <systemPath>${basedir}/lib/pinyin4j-2.5.0.jar</systemPath>
             <scope>system</scope>
+        </dependency>
+          <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>4.2.1</version>
         </dependency>
 
         <dependency>

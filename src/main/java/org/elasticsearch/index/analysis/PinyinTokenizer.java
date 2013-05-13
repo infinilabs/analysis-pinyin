@@ -47,8 +47,9 @@ public class PinyinTokenizer extends Tokenizer {
 
     @Override
     public final boolean incrementToken() throws IOException {
+        clearAttributes();
+
         if (!done) {
-            clearAttributes();
             done = true;
             int upto = 0;
             char[] buffer = termAtt.buffer();
@@ -124,9 +125,8 @@ public class PinyinTokenizer extends Tokenizer {
         offsetAtt.setOffset(finalOffset, finalOffset);
     }
 
-    @Override
     public void reset(Reader input) throws IOException {
-        super.reset(input);
+        super.reset();
         this.done = false;
     }
 

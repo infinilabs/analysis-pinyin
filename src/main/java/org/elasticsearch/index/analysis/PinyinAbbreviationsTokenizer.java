@@ -6,8 +6,9 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
-import org.apache.lucene.analysis.CharTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.util.CharTokenizer;
+import org.apache.lucene.util.Version;
 
 import java.io.Reader;
 import java.util.regex.Matcher;
@@ -26,7 +27,7 @@ public class PinyinAbbreviationsTokenizer extends CharTokenizer {
     }
 
     public PinyinAbbreviationsTokenizer(Reader input, int bufferSize) {
-        super(input);
+        super(Version.LUCENE_31,input);
         termAtt.resizeBuffer(bufferSize);
         format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
         format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);

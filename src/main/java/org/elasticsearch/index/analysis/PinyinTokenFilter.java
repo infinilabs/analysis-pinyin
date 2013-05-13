@@ -17,9 +17,6 @@ package org.elasticsearch.index.analysis;
  * limitations under the License.
  */
 
-import java.io.IOException;
-import java.io.Reader;
-
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
@@ -30,8 +27,8 @@ import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
-import org.apache.lucene.util.Version;
+
+import java.io.IOException;
 
 /**
  */
@@ -44,10 +41,10 @@ public class PinyinTokenFilter extends TokenFilter {
     private String first_letter;
     @Override
     public final boolean incrementToken() throws IOException {
+
         if (!input.incrementToken()) {
             return false;
         }
-
         final char[] buffer = termAtt.buffer();
         final int bufferLength = termAtt.length();
         StringBuilder stringBuilder = new StringBuilder();
@@ -111,4 +108,5 @@ public class PinyinTokenFilter extends TokenFilter {
         format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
         format.setVCharType(HanyuPinyinVCharType.WITH_V);
     }
+
 }
