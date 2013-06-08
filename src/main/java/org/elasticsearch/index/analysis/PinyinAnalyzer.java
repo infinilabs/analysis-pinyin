@@ -25,7 +25,11 @@ public final class PinyinAnalyzer extends Analyzer {
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-        return new TokenStreamComponents(new PinyinTokenizer(reader,padding_char,first_letter));
+                    if (first_letter.equals("only")) {
+                        return new TokenStreamComponents(new PinyinAbbreviationsTokenizer(reader));
+                    } else {
+                        return new TokenStreamComponents(new PinyinTokenizer(reader, padding_char, first_letter));
+                    }
     }
 
 }

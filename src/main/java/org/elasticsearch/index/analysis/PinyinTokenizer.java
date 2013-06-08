@@ -125,7 +125,7 @@ public class PinyinTokenizer extends Tokenizer {
         offsetAtt.setOffset(finalOffset, finalOffset);
     }
 
-    public void reset(Reader input) throws IOException {
+    public void reset() throws IOException {
         super.reset();
         this.done = false;
     }

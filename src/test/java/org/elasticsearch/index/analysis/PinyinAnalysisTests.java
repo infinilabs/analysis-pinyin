@@ -62,11 +62,13 @@ public class PinyinAnalysisTests {
 
         AnalysisService analysisService = injector.getInstance(AnalysisService.class);
 
+
         TokenizerFactory tokenizerFactory = analysisService.tokenizer("pinyin");
         MatcherAssert.assertThat(tokenizerFactory, instanceOf(PinyinTokenizerFactory.class));
 
         TokenFilterFactory tokenFilterFactory = analysisService.tokenFilter("pinyin");
         MatcherAssert.assertThat(tokenFilterFactory,instanceOf(PinyinTokenFilterFactory.class));
+
 
     }
 

@@ -27,7 +27,7 @@ public class PinyinAbbreviationsTokenizer extends CharTokenizer {
     }
 
     public PinyinAbbreviationsTokenizer(Reader input, int bufferSize) {
-        super(Version.LUCENE_31,input);
+        super(Version.LUCENE_41,input);
         termAtt.resizeBuffer(bufferSize);
         format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
         format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
