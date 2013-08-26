@@ -17,6 +17,7 @@ package org.elasticsearch.index.analysis;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -36,84 +37,81 @@ public class PinyinTokenFilter extends TokenFilter {
 
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-    private String padding_char;
-    private String first_letter;
+    private String mode;
+    private List<String> array = null;
+    private Iterator<String> tokenIter = null;
 
     @Override
     public final boolean incrementToken() throws IOException {
-
-        if (!input.incrementToken()) {
-            return false;
-        }
-        final char[] buffer = termAtt.buffer();
-        final int bufferLength = termAtt.length();
-        String[][] tmpFull = new String[bufferLength][];
-        String[][] tmpFirst = new String[bufferLength][];
-        for (int i = 0; i < bufferLength; i++) {
-            char c = buffer[i];
-            // 是中文或者a-z或者A-Z转换拼音(我的需求，是保留中文或者a-z或者A-Z)
-            try {
-                tmpFull[i] = PinyinHelper.toHanyuPinyinStringArray(c, format);
-                if (tmpFull[i] != null) {
-                    tmpFull[i] = PinyinUtil.removeDuplicates(tmpFull[i]);
-                    List<String> firstLetters = new ArrayList<String>();
-                    for (String py : tmpFull[i]) {
-                        String firstLetter = py.substring(0, 1);
-                        if (!firstLetters.contains(firstLetter)) firstLetters.add(firstLetter);
+        if (tokenIter == null || !tokenIter.hasNext()) {
+            if (!input.incrementToken()) {
+                return false;
+            }
+            final char[] buffer = termAtt.buffer();
+            final int bufferLength = termAtt.length();
+            String[][] tmpFull = new String[bufferLength][];
+            String[][] tmpFirst = new String[bufferLength][];
+            for (int i = 0; i < bufferLength; i++) {
+                char c = buffer[i];
+                // 是中文或者a-z或者A-Z转换拼音(我的需求，是保留中文或者a-z或者A-Z)
+                try {
+                    tmpFull[i] = PinyinHelper.toHanyuPinyinStringArray(c, format);
+                    if (tmpFull[i] != null) {
+                        tmpFull[i] = PinyinUtil.removeDuplicates(tmpFull[i]);
+                        List<String> firstLetters = new ArrayList<String>();
+                        for (String py : tmpFull[i]) {
+                            String firstLetter = py.substring(0, 1);
+                            if (!firstLetters.contains(firstLetter)) firstLetters.add(firstLetter);
+                        }
+                        tmpFirst[i] = firstLetters.toArray(new String[firstLetters.size()]);
+                    } else {
+                        tmpFull[i] = new String[] {String.valueOf(c)};
+                        tmpFirst[i] = new String[] {String.valueOf(c)};
                     }
-                    tmpFirst[i] = firstLetters.toArray(new String[firstLetters.size()]);
-                } else {
-                    tmpFull[i] = new String[] {String.valueOf(c)};
-                    tmpFirst[i] = new String[] {String.valueOf(c)};
+                } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
+                    badHanyuPinyinOutputFormatCombination.printStackTrace();
                 }
-            } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
-                badHanyuPinyinOutputFormatCombination.printStackTrace();
             }
+
+            // let's join them
+            if (mode.equals("all")) {
+                array = new ArrayList<String>();
+                array.add(termAtt.toString());
+                array.addAll(PinyinUtil.exchange(tmpFirst));
+                array.addAll(PinyinUtil.exchange(tmpFull));
+            } else if (mode.equals("normal")) {
+                array = new ArrayList<String>();
+                array.addAll(PinyinUtil.exchange(tmpFirst));
+                array.addAll(PinyinUtil.exchange(tmpFull));
+            } else if (mode.equals("full_only")) {
+                array = PinyinUtil.exchange(tmpFull);
+            } else if (mode.equals("first_only")) {
+                array = PinyinUtil.exchange(tmpFirst);
+            }
+            tokenIter = array.iterator();
+
+            if (!tokenIter.hasNext()) return false;
         }
 
-        StringBuilder pinyinStringBuilder = new StringBuilder();
-        // let's join them
-        if (first_letter.equals("all")) {
-            pinyinStringBuilder.append(buffer).append(this.padding_char);
-            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
-            if (this.padding_char.length() > 0) {
-                pinyinStringBuilder.append(this.padding_char);
-            }
-            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFull, this.padding_char));
-        } else if (first_letter.equals("prefix")) {
-            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
-            if (this.padding_char.length() > 0) {
-                pinyinStringBuilder.append(this.padding_char);
-            }
-            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFull, this.padding_char));
-        } else if (first_letter.equals("append")) {
-            String full = PinyinUtil.exchange(tmpFull, this.padding_char);
-            pinyinStringBuilder.append(full);
-            if (this.padding_char.length() > 0) {
-                if (!full.endsWith(this.padding_char)) {
-                    pinyinStringBuilder.append(this.padding_char);
-                }
-            }
-            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
-        } else if (first_letter.equals("none")) {
-            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFull, this.padding_char));
-        } else if (first_letter.equals("only")) {
-            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
-        }
-        termAtt.setEmpty();
-        termAtt.resizeBuffer(pinyinStringBuilder.length());
-        termAtt.append(pinyinStringBuilder);
-        termAtt.setLength(pinyinStringBuilder.length());
+        clearAttributes();
+
+        String token = tokenIter.next();
+        termAtt.copyBuffer(token.toCharArray(), 0, token.length());
         return true;
     }
 
-    public PinyinTokenFilter(TokenStream in, String padding_char, String first_letter) {
+    public PinyinTokenFilter(TokenStream in, String mode) {
         super(in);
-        this.padding_char = padding_char;
-        this.first_letter = first_letter;
+        this.mode = mode;
         format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
         format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
         format.setVCharType(HanyuPinyinVCharType.WITH_V);
+    }
+
+    @Override
+    public void reset() throws IOException {
+        super.reset();
+        tokenIter = null;
     }
 
 }

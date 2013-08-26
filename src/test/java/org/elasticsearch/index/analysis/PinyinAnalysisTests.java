@@ -79,7 +79,8 @@ public class PinyinAnalysisTests extends TestCase {
     public void testTokenFilter() throws IOException {
         StringReader sr = new StringReader("刘德华");
         Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_41);
-        PinyinTokenFilter filter = new PinyinTokenFilter(analyzer.tokenStream("f", sr), "", "none");
+        PinyinTokenFilter filter =
+                new PinyinTokenFilter(analyzer.tokenStream("f", sr), "full_only");
         List<String> pinyin = new ArrayList<String>();
         filter.reset();
         while (filter.incrementToken()) {
@@ -96,7 +97,7 @@ public class PinyinAnalysisTests extends TestCase {
 
         sr = new StringReader("刘德华");
         analyzer = new KeywordAnalyzer();
-        filter = new PinyinTokenFilter(analyzer.tokenStream("f", sr), "", "only");
+        filter = new PinyinTokenFilter(analyzer.tokenStream("f", sr), "first_only");
         pinyin.clear();
         while (filter.incrementToken()) {
             CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
@@ -107,13 +108,13 @@ public class PinyinAnalysisTests extends TestCase {
     }
 
     @Test
-    public void TestTokenizer() throws IOException {
+    public void testTokenizer() throws IOException {
         String[] s = {"刘德华", "劉德華", "刘德华A1", "刘德华A2", "音乐abcd"};
         for (String value : s) {
             System.out.println(value);
             StringReader sr = new StringReader(value);
 
-            PinyinTokenizer tokenizer = new PinyinTokenizer(sr, " ", "all");
+            PinyinTokenizer tokenizer = new PinyinTokenizer(sr, "all");
             // PinyinTokenizer tokenizer = new PinyinTokenizer(sr, " ", "only");
             // PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ","prefix");
             // PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ","append");

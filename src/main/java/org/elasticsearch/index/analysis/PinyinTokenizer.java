@@ -3,6 +3,7 @@ package org.elasticsearch.index.analysis;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -14,7 +15,6 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 
 /**
  * Created by IntelliJ IDEA. User: Medcl' Date: 12-5-21 Time: 下午5:53
@@ -23,18 +23,16 @@ public class PinyinTokenizer extends Tokenizer {
 
     private static final int DEFAULT_BUFFER_SIZE = 256;
 
-    private boolean done = false;
-    private int finalOffset;
-    private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-    private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
-    private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-    private String padding_char;
-    private String first_letter;
+    private List<String> array = null;
+    private Iterator<String> tokenIter = null;
 
-    public PinyinTokenizer(Reader reader, String padding_char, String first_letter) {
+    private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
+    private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
+    private String mode;
+
+    public PinyinTokenizer(Reader reader, String mode) {
         this(reader, DEFAULT_BUFFER_SIZE);
-        this.padding_char = padding_char;
-        this.first_letter = first_letter;
+        this.mode = mode;
     }
 
     public PinyinTokenizer(Reader input, int bufferSize) {
@@ -47,10 +45,7 @@ public class PinyinTokenizer extends Tokenizer {
 
     @Override
     public final boolean incrementToken() throws IOException {
-        clearAttributes();
-
-        if (!done) {
-            done = true;
+        if (tokenIter == null || !tokenIter.hasNext()) {
             int upto = 0;
             char[] buffer = termAtt.buffer();
             while (true) {
@@ -59,6 +54,7 @@ public class PinyinTokenizer extends Tokenizer {
                 upto += length;
                 if (upto == buffer.length) buffer = termAtt.resizeBuffer(1 + buffer.length);
             }
+            if (upto == 0) return false;
             termAtt.setLength(upto);
             String str = termAtt.toString();
             termAtt.setEmpty();
@@ -87,51 +83,34 @@ public class PinyinTokenizer extends Tokenizer {
             }
 
             // let's join them
-            if (first_letter.equals("all")) {
-                termAtt.append(str).append(this.padding_char);
-                termAtt.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
-                if (this.padding_char.length() > 0) {
-                    termAtt.append(this.padding_char);
-                }
-                termAtt.append(PinyinUtil.exchange(tmpFull, this.padding_char));
-            } else if (first_letter.equals("prefix")) {
-                termAtt.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
-                if (this.padding_char.length() > 0) {
-                    termAtt.append(this.padding_char);
-                }
-                termAtt.append(PinyinUtil.exchange(tmpFull, this.padding_char));
-            } else if (first_letter.equals("append")) {
-                String full = PinyinUtil.exchange(tmpFull, this.padding_char);
-                termAtt.append(full);
-                if (this.padding_char.length() > 0) {
-                    if (!full.endsWith(this.padding_char)) {
-                        termAtt.append(this.padding_char);
-                    }
-                }
-                termAtt.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
-            } else if (first_letter.equals("none")) {
-                termAtt.append(PinyinUtil.exchange(tmpFull, this.padding_char));
-            } else if (first_letter.equals("only")) {
-                termAtt.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
+            if (mode.equals("all")) {
+                array = new ArrayList<String>();
+                array.add(str);
+                array.addAll(PinyinUtil.exchange(tmpFirst));
+                array.addAll(PinyinUtil.exchange(tmpFull));
+            } else if (mode.equals("normal")) {
+                array = new ArrayList<String>();
+                array.addAll(PinyinUtil.exchange(tmpFirst));
+                array.addAll(PinyinUtil.exchange(tmpFull));
+            } else if (mode.equals("full_only")) {
+                array = PinyinUtil.exchange(tmpFull);
+            } else if (mode.equals("first_only")) {
+                array = PinyinUtil.exchange(tmpFirst);
             }
+            tokenIter = array.iterator();
 
-
-            finalOffset = correctOffset(upto);
-            offsetAtt.setOffset(correctOffset(0), finalOffset);
-            return true;
+            if (!tokenIter.hasNext()) return false;
         }
-        return false;
-    }
+        clearAttributes();
 
-    @Override
-    public final void end() {
-        // set final offset
-        offsetAtt.setOffset(finalOffset, finalOffset);
+        String word = tokenIter.next();
+        termAtt.copyBuffer(word.toCharArray(), 0, word.length());
+        return true;
     }
 
     public void reset() throws IOException {
         super.reset();
-        this.done = false;
+        this.tokenIter = null;
     }
 
 
