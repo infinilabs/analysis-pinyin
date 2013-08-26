@@ -1,23 +1,23 @@
 package org.elasticsearch.index.analysis;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 
-import java.io.IOException;
-import java.io.Reader;
-
 /**
- * Created by IntelliJ IDEA.
- * User: Medcl'
- * Date: 12-5-21
- * Time: 下午5:53
+ * Created by IntelliJ IDEA. User: Medcl' Date: 12-5-21 Time: 下午5:53
  */
 public class PinyinTokenizer extends Tokenizer {
 
@@ -57,58 +57,62 @@ public class PinyinTokenizer extends Tokenizer {
                 final int length = input.read(buffer, upto, buffer.length - upto);
                 if (length == -1) break;
                 upto += length;
-                if (upto == buffer.length)
-                    buffer = termAtt.resizeBuffer(1 + buffer.length);
+                if (upto == buffer.length) buffer = termAtt.resizeBuffer(1 + buffer.length);
             }
             termAtt.setLength(upto);
             String str = termAtt.toString();
             termAtt.setEmpty();
-            StringBuilder stringBuilder = new StringBuilder();
-            StringBuilder firstLetters = new StringBuilder();
+            String[][] tmpFull = new String[upto][];
+            String[][] tmpFirst = new String[upto][];
             for (int i = 0; i < str.length(); i++) {
                 char c = str.charAt(i);
-                if (c < 128) {
-                    stringBuilder.append(c);
-                } else {
-                    try {
-                        String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
-                        if (strs != null) {
-                            //get first result by default
-                            String first_value = strs[0];
-                            //TODO more than one pinyin
-                            stringBuilder.append(first_value);
-                            if (this.padding_char.length() > 0) {
-                                stringBuilder.append(this.padding_char);
-                            }
-                            firstLetters.append(first_value.charAt(0));
-
+                // 是中文或者a-z或者A-Z转换拼音(我的需求，是保留中文或者a-z或者A-Z)
+                try {
+                    tmpFull[i] = PinyinHelper.toHanyuPinyinStringArray(c, format);
+                    if (tmpFull[i] != null) {
+                        tmpFull[i] = PinyinUtil.removeDuplicates(tmpFull[i]);
+                        List<String> firstLetters = new ArrayList<String>();
+                        for (String py : tmpFull[i]) {
+                            String firstLetter = py.substring(0, 1);
+                            if (!firstLetters.contains(firstLetter)) firstLetters.add(firstLetter);
                         }
-                    } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
-                        badHanyuPinyinOutputFormatCombination.printStackTrace();
+                        tmpFirst[i] = firstLetters.toArray(new String[firstLetters.size()]);
+                    } else {
+                        tmpFull[i] = new String[] {String.valueOf(c)};
+                        tmpFirst[i] = new String[] {String.valueOf(c)};
                     }
+                } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
+                    badHanyuPinyinOutputFormatCombination.printStackTrace();
                 }
             }
 
-            //let's join them
-            if (first_letter.equals("prefix")) {
-                termAtt.append(firstLetters.toString());
+            // let's join them
+            if (first_letter.equals("all")) {
+                termAtt.append(str).append(this.padding_char);
+                termAtt.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
                 if (this.padding_char.length() > 0) {
-                    termAtt.append(this.padding_char); //TODO splitter
+                    termAtt.append(this.padding_char);
                 }
-                termAtt.append(stringBuilder.toString());
-            } else if (first_letter.equals("append")) {
-                termAtt.append(stringBuilder.toString());
+                termAtt.append(PinyinUtil.exchange(tmpFull, this.padding_char));
+            } else if (first_letter.equals("prefix")) {
+                termAtt.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
                 if (this.padding_char.length() > 0) {
-                    if(!stringBuilder.toString().endsWith(this.padding_char))
-                    {
+                    termAtt.append(this.padding_char);
+                }
+                termAtt.append(PinyinUtil.exchange(tmpFull, this.padding_char));
+            } else if (first_letter.equals("append")) {
+                String full = PinyinUtil.exchange(tmpFull, this.padding_char);
+                termAtt.append(full);
+                if (this.padding_char.length() > 0) {
+                    if (!full.endsWith(this.padding_char)) {
                         termAtt.append(this.padding_char);
                     }
                 }
-                termAtt.append(firstLetters.toString());
+                termAtt.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
             } else if (first_letter.equals("none")) {
-                termAtt.append(stringBuilder.toString());
+                termAtt.append(PinyinUtil.exchange(tmpFull, this.padding_char));
             } else if (first_letter.equals("only")) {
-                termAtt.append(firstLetters.toString());
+                termAtt.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
             }
 
 

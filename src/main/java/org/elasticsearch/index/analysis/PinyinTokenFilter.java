@@ -1,21 +1,23 @@
 package org.elasticsearch.index.analysis;
 
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to You under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
@@ -23,22 +25,20 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-
-import java.io.IOException;
 
 /**
  */
 public class PinyinTokenFilter extends TokenFilter {
 
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-    private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
     private String padding_char;
     private String first_letter;
+
     @Override
     public final boolean incrementToken() throws IOException {
 
@@ -47,51 +47,58 @@ public class PinyinTokenFilter extends TokenFilter {
         }
         final char[] buffer = termAtt.buffer();
         final int bufferLength = termAtt.length();
-        StringBuilder stringBuilder = new StringBuilder();
-        StringBuilder firstLetters = new StringBuilder();
+        String[][] tmpFull = new String[bufferLength][];
+        String[][] tmpFirst = new String[bufferLength][];
         for (int i = 0; i < bufferLength; i++) {
             char c = buffer[i];
-            if (c < 128) {
-                stringBuilder.append(c);
-            } else {
-                try {
-                    String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
-                    if (strs != null) {
-                        //get first result by default
-                        String first_value = strs[0];
-                        //TODO more than one pinyin
-                        stringBuilder.append(first_value);
-                        if (this.padding_char.length() > 0) {
-                            stringBuilder.append(this.padding_char);
-                        }
-                        firstLetters.append(first_value.charAt(0));
-
+            // 是中文或者a-z或者A-Z转换拼音(我的需求，是保留中文或者a-z或者A-Z)
+            try {
+                tmpFull[i] = PinyinHelper.toHanyuPinyinStringArray(c, format);
+                if (tmpFull[i] != null) {
+                    tmpFull[i] = PinyinUtil.removeDuplicates(tmpFull[i]);
+                    List<String> firstLetters = new ArrayList<String>();
+                    for (String py : tmpFull[i]) {
+                        String firstLetter = py.substring(0, 1);
+                        if (!firstLetters.contains(firstLetter)) firstLetters.add(firstLetter);
                     }
-                } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
-                    badHanyuPinyinOutputFormatCombination.printStackTrace();
+                    tmpFirst[i] = firstLetters.toArray(new String[firstLetters.size()]);
+                } else {
+                    tmpFull[i] = new String[] {String.valueOf(c)};
+                    tmpFirst[i] = new String[] {String.valueOf(c)};
                 }
+            } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
+                badHanyuPinyinOutputFormatCombination.printStackTrace();
             }
         }
 
         StringBuilder pinyinStringBuilder = new StringBuilder();
-        if (first_letter.equals("prefix")) {
-            pinyinStringBuilder.append(firstLetters.toString());
+        // let's join them
+        if (first_letter.equals("all")) {
+            pinyinStringBuilder.append(buffer).append(this.padding_char);
+            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
             if (this.padding_char.length() > 0) {
-                pinyinStringBuilder.append(this.padding_char); //TODO splitter
+                pinyinStringBuilder.append(this.padding_char);
             }
-            pinyinStringBuilder.append(stringBuilder.toString());
-        } else if (first_letter.equals("append")) {
-            pinyinStringBuilder.append(stringBuilder.toString());
+            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFull, this.padding_char));
+        } else if (first_letter.equals("prefix")) {
+            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
             if (this.padding_char.length() > 0) {
-                if (!stringBuilder.toString().endsWith(this.padding_char)) {
+                pinyinStringBuilder.append(this.padding_char);
+            }
+            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFull, this.padding_char));
+        } else if (first_letter.equals("append")) {
+            String full = PinyinUtil.exchange(tmpFull, this.padding_char);
+            pinyinStringBuilder.append(full);
+            if (this.padding_char.length() > 0) {
+                if (!full.endsWith(this.padding_char)) {
                     pinyinStringBuilder.append(this.padding_char);
                 }
             }
-            pinyinStringBuilder.append(firstLetters.toString());
+            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
         } else if (first_letter.equals("none")) {
-            pinyinStringBuilder.append(stringBuilder.toString());
+            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFull, this.padding_char));
         } else if (first_letter.equals("only")) {
-            pinyinStringBuilder.append(firstLetters.toString());
+            pinyinStringBuilder.append(PinyinUtil.exchange(tmpFirst, this.padding_char));
         }
         termAtt.setEmpty();
         termAtt.resizeBuffer(pinyinStringBuilder.length());
