@@ -109,7 +109,7 @@ public class PinyinAnalysisTests extends TestCase {
 
     @Test
     public void testTokenizer() throws IOException {
-        String[] s = {"刘德华", "劉德華", "刘德华A1", "刘德华A2", "音乐abcd"};
+        String[] s = {"刘德华", "劉德華", "刘德华A1", "刘德华A2", "音乐abcd", "音乐"};
         for (String value : s) {
             System.out.println(value);
             StringReader sr = new StringReader(value);

@@ -88,19 +88,20 @@ public class PinyinTokenizer extends Tokenizer {
                 array.add(str);
                 array.addAll(PinyinUtil.exchange(tmpFirst));
                 array.addAll(PinyinUtil.exchange(tmpFull));
-            } else if (mode.equals("normal")) {
-                array = new ArrayList<String>();
-                array.addAll(PinyinUtil.exchange(tmpFirst));
-                array.addAll(PinyinUtil.exchange(tmpFull));
             } else if (mode.equals("full_only")) {
                 array = PinyinUtil.exchange(tmpFull);
             } else if (mode.equals("first_only")) {
                 array = PinyinUtil.exchange(tmpFirst);
+            } else {
+                array = new ArrayList<String>();
+                array.addAll(PinyinUtil.exchange(tmpFirst));
+                array.addAll(PinyinUtil.exchange(tmpFull));
             }
             tokenIter = array.iterator();
 
             if (!tokenIter.hasNext()) return false;
         }
+
         clearAttributes();
 
         String word = tokenIter.next();
