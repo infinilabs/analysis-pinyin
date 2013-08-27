@@ -1,21 +1,24 @@
 package org.elasticsearch.index.analysis;
 
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to You under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
@@ -23,90 +26,92 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-
-import java.io.IOException;
 
 /**
  */
 public class PinyinTokenFilter extends TokenFilter {
 
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-    private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-    private String padding_char;
-    private String first_letter;
+    private String mode;
+    private List<String> array = null;
+    private Iterator<String> tokenIter = null;
+
     @Override
     public final boolean incrementToken() throws IOException {
-
-        if (!input.incrementToken()) {
-            return false;
-        }
-        final char[] buffer = termAtt.buffer();
-        final int bufferLength = termAtt.length();
-        StringBuilder stringBuilder = new StringBuilder();
-        StringBuilder firstLetters = new StringBuilder();
-        for (int i = 0; i < bufferLength; i++) {
-            char c = buffer[i];
-            if (c < 128) {
-                stringBuilder.append(c);
-            } else {
+        if (tokenIter == null || !tokenIter.hasNext()) {
+            if (!input.incrementToken()) {
+                return false;
+            }
+            final char[] buffer = termAtt.buffer();
+            final int bufferLength = termAtt.length();
+            String[][] tmpFull = new String[bufferLength][];
+            String[][] tmpFirst = new String[bufferLength][];
+            for (int i = 0; i < bufferLength; i++) {
+                char c = buffer[i];
+                // 是中文或者a-z或者A-Z转换拼音(我的需求，是保留中文或者a-z或者A-Z)
                 try {
-                    String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
-                    if (strs != null) {
-                        //get first result by default
-                        String first_value = strs[0];
-                        //TODO more than one pinyin
-                        stringBuilder.append(first_value);
-                        if (this.padding_char.length() > 0) {
-                            stringBuilder.append(this.padding_char);
+                    tmpFull[i] = PinyinHelper.toHanyuPinyinStringArray(c, format);
+                    if (tmpFull[i] != null) {
+                        tmpFull[i] = PinyinUtil.removeDuplicates(tmpFull[i]);
+                        List<String> firstLetters = new ArrayList<String>();
+                        for (String py : tmpFull[i]) {
+                            String firstLetter = py.substring(0, 1);
+                            if (!firstLetters.contains(firstLetter)) firstLetters.add(firstLetter);
                         }
-                        firstLetters.append(first_value.charAt(0));
-
+                        tmpFirst[i] = firstLetters.toArray(new String[firstLetters.size()]);
+                    } else {
+                        tmpFull[i] = new String[] {String.valueOf(c)};
+                        tmpFirst[i] = new String[] {String.valueOf(c)};
                     }
                 } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
                     badHanyuPinyinOutputFormatCombination.printStackTrace();
                 }
             }
+
+            // let's join them
+            if (mode.equals("all")) {
+                array = new ArrayList<String>();
+                array.add(termAtt.toString());
+                array.addAll(PinyinUtil.exchange(tmpFirst));
+                array.addAll(PinyinUtil.exchange(tmpFull));
+            } else if (mode.equals("full_only")) {
+                array = PinyinUtil.exchange(tmpFull);
+            } else if (mode.equals("first_only")) {
+                array = PinyinUtil.exchange(tmpFirst);
+            } else {
+                array = new ArrayList<String>();
+                array.addAll(PinyinUtil.exchange(tmpFirst));
+                array.addAll(PinyinUtil.exchange(tmpFull));
+            }
+            tokenIter = array.iterator();
+
+            if (!tokenIter.hasNext()) return false;
         }
 
-        StringBuilder pinyinStringBuilder = new StringBuilder();
-        if (first_letter.equals("prefix")) {
-            pinyinStringBuilder.append(firstLetters.toString());
-            if (this.padding_char.length() > 0) {
-                pinyinStringBuilder.append(this.padding_char); //TODO splitter
-            }
-            pinyinStringBuilder.append(stringBuilder.toString());
-        } else if (first_letter.equals("append")) {
-            pinyinStringBuilder.append(stringBuilder.toString());
-            if (this.padding_char.length() > 0) {
-                if (!stringBuilder.toString().endsWith(this.padding_char)) {
-                    pinyinStringBuilder.append(this.padding_char);
-                }
-            }
-            pinyinStringBuilder.append(firstLetters.toString());
-        } else if (first_letter.equals("none")) {
-            pinyinStringBuilder.append(stringBuilder.toString());
-        } else if (first_letter.equals("only")) {
-            pinyinStringBuilder.append(firstLetters.toString());
-        }
-        termAtt.setEmpty();
-        termAtt.resizeBuffer(pinyinStringBuilder.length());
-        termAtt.append(pinyinStringBuilder);
-        termAtt.setLength(pinyinStringBuilder.length());
+        clearAttributes();
+
+        String token = tokenIter.next();
+        termAtt.copyBuffer(token.toCharArray(), 0, token.length());
         return true;
     }
 
-    public PinyinTokenFilter(TokenStream in, String padding_char, String first_letter) {
+    public PinyinTokenFilter(TokenStream in, String mode) {
         super(in);
-        this.padding_char = padding_char;
-        this.first_letter = first_letter;
+        this.mode = mode;
         format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
         format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
         format.setVCharType(HanyuPinyinVCharType.WITH_V);
+    }
+
+    @Override
+    public void reset() throws IOException {
+        super.reset();
+        tokenIter = null;
     }
 
 }
