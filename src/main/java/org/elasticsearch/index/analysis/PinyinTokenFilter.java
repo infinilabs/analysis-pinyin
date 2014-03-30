@@ -41,7 +41,6 @@ public class PinyinTokenFilter extends TokenFilter {
     private String first_letter;
     @Override
     public final boolean incrementToken() throws IOException {
-
         if (!input.incrementToken()) {
             return false;
         }
@@ -108,5 +107,17 @@ public class PinyinTokenFilter extends TokenFilter {
         format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
         format.setVCharType(HanyuPinyinVCharType.WITH_V);
     }
+
+    @Override
+    public final void end() throws IOException {
+        // set final offset
+      super.end();
+    }
+
+    @Override
+    public void reset() throws IOException {
+        super.reset();
+    }
+
 
 }
