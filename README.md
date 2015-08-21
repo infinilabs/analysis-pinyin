@@ -93,7 +93,7 @@ curl -XPUT http://localhost:9200/medcl/_settings -d'
         "analysis" : {
             "analyzer" : {
                 "pinyin_analyzer" : {
-                    "tokenizer" : ["my_pinyin"],
+                    "tokenizer" : "my_pinyin",
                     "filter" : ["standard","nGram"]
                 }
             },
