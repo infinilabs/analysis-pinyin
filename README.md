@@ -36,8 +36,8 @@ curl -XPUT http://localhost:9200/medcl/ -d'
             "analyzer" : {
                 "pinyin_analyzer" : {
                     "tokenizer" : "my_pinyin",
-                    "filter" : ["standard"]
-                }
+                    "filter" : "word_delimiter
+]                }
             },
             "tokenizer" : {
                 "my_pinyin" : {
@@ -94,14 +94,14 @@ curl -XPUT http://localhost:9200/medcl/_settings -d'
             "analyzer" : {
                 "pinyin_analyzer" : {
                     "tokenizer" : "my_pinyin",
-                    "filter" : ["standard","nGram"]
+                    "filter" : ["word_delimiter","nGram"]
                 }
             },
             "tokenizer" : {
                 "my_pinyin" : {
                     "type" : "pinyin",
                     "first_letter" : "prefix",
-                    "padding_char" : ""
+                    "padding_char" : " "
                 }
             }
         }
@@ -161,7 +161,7 @@ curl -XPUT http://localhost:9200/medcl1/ -d'
             "analyzer" : {
                 "user_name_analyzer" : {
                     "tokenizer" : "whitespace",
-                    "filter" : ["standard","pinyin_filter"]
+                    "filter" : "pinyin_filter"
                 }
             },
             "filter" : {
