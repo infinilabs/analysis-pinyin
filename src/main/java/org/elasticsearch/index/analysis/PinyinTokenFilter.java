@@ -52,6 +52,7 @@ public class PinyinTokenFilter extends TokenFilter {
             char c = buffer[i];
             if (c < 128) {
                 stringBuilder.append(c);
+                firstLetters.append(c);
             } else {
                 try {
                     String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
