@@ -7,8 +7,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.settings.IndexSettings;
 
-import java.io.Reader;
-
 public class PinyinAbbreviationsTokenizerFactory extends AbstractTokenizerFactory {
     @Inject
     public PinyinAbbreviationsTokenizerFactory(Index index, @IndexSettings Settings indexSettings, @Assisted String name, @Assisted Settings settings) {
@@ -16,7 +14,7 @@ public class PinyinAbbreviationsTokenizerFactory extends AbstractTokenizerFactor
     }
 
     @Override
-    public Tokenizer create(Reader reader) {
-        return new PinyinAbbreviationsTokenizer(reader);
+    public Tokenizer create() {
+        return new PinyinAbbreviationsTokenizer();
     }
 }

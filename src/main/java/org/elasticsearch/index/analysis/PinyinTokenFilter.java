@@ -7,9 +7,9 @@ package org.elasticsearch.index.analysis;
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,20 +27,32 @@ import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.elasticsearch.common.logging.ESLogger;
+import org.elasticsearch.common.logging.ESLoggerFactory;
 
 import java.io.IOException;
 
-/**
- */
 public class PinyinTokenFilter extends TokenFilter {
 
+    private final ESLogger logger = ESLoggerFactory.getLogger("pinyin-analyzer");
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
     private String padding_char;
     private String first_letter;
+
+    public PinyinTokenFilter(TokenStream in, String first_letter, String padding_char) {
+        super(in);
+        this.padding_char = padding_char;
+        this.first_letter = first_letter;
+        format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        format.setVCharType(HanyuPinyinVCharType.WITH_V);
+    }
+
     @Override
     public final boolean incrementToken() throws IOException {
+
         if (!input.incrementToken()) {
             return false;
         }
@@ -52,25 +64,33 @@ public class PinyinTokenFilter extends TokenFilter {
             char c = buffer[i];
             if (c < 128) {
                 stringBuilder.append(c);
+                firstLetters.append(c);
+
             } else {
+
                 try {
                     String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
                     if (strs != null) {
                         //get first result by default
                         String first_value = strs[0];
                         //TODO more than one pinyin
+                        if (this.padding_char.length() > 0) {
+                            if (stringBuilder.length() > 0) stringBuilder.append(this.padding_char);
+                            if (firstLetters.length() > 0) firstLetters.append(this.padding_char);
+                        }
                         stringBuilder.append(first_value);
+                        firstLetters.append(first_value.charAt(0));
                         if (this.padding_char.length() > 0) {
                             stringBuilder.append(this.padding_char);
+                            firstLetters.append(this.padding_char);
                         }
-                        firstLetters.append(first_value.charAt(0));
-
                     }
                 } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
-                    badHanyuPinyinOutputFormatCombination.printStackTrace();
+                    logger.error("pinyin-filter", badHanyuPinyinOutputFormatCombination);
                 }
             }
         }
+
 
         StringBuilder pinyinStringBuilder = new StringBuilder();
         if (first_letter.equals("prefix")) {
@@ -82,7 +102,7 @@ public class PinyinTokenFilter extends TokenFilter {
         } else if (first_letter.equals("append")) {
             pinyinStringBuilder.append(stringBuilder.toString());
             if (this.padding_char.length() > 0) {
-                if (!stringBuilder.toString().endsWith(this.padding_char)) {
+                if (!stringBuilder.toString().endsWith(this.padding_char)) {//TODO
                     pinyinStringBuilder.append(this.padding_char);
                 }
             }
@@ -99,19 +119,10 @@ public class PinyinTokenFilter extends TokenFilter {
         return true;
     }
 
-    public PinyinTokenFilter(TokenStream in, String padding_char, String first_letter) {
-        super(in);
-        this.padding_char = padding_char;
-        this.first_letter = first_letter;
-        format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        format.setVCharType(HanyuPinyinVCharType.WITH_V);
-    }
-
     @Override
     public final void end() throws IOException {
         // set final offset
-      super.end();
+        super.end();
     }
 
     @Override

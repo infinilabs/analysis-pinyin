@@ -9,9 +9,10 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.elasticsearch.common.logging.ESLogger;
+import org.elasticsearch.common.logging.ESLoggerFactory;
 
 import java.io.IOException;
-import java.io.Reader;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,23 +23,23 @@ import java.io.Reader;
 public class PinyinTokenizer extends Tokenizer {
 
     private static final int DEFAULT_BUFFER_SIZE = 256;
-
+    private final ESLogger logger = ESLoggerFactory.getLogger("pinyin-analyzer");
+    private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private boolean done = false;
     private int finalOffset;
-    private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
     private String padding_char;
     private String first_letter;
 
-    public PinyinTokenizer(Reader reader, String padding_char, String first_letter) {
-        this(reader, DEFAULT_BUFFER_SIZE);
+    public PinyinTokenizer(String first_letter, String padding_char) {
+        this(DEFAULT_BUFFER_SIZE);
         this.padding_char = padding_char;
         this.first_letter = first_letter;
     }
 
-    public PinyinTokenizer(Reader input, int bufferSize) {
-        super(input);
+    public PinyinTokenizer(int bufferSize) {
+        super();
         termAtt.resizeBuffer(bufferSize);
         format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
         format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
@@ -69,6 +70,7 @@ public class PinyinTokenizer extends Tokenizer {
                 char c = str.charAt(i);
                 if (c < 128) {
                     stringBuilder.append(c);
+                    firstLetters.append(c);
                 } else {
                     try {
                         String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
@@ -76,15 +78,21 @@ public class PinyinTokenizer extends Tokenizer {
                             //get first result by default
                             String first_value = strs[0];
                             //TODO more than one pinyin
-                            stringBuilder.append(first_value);
                             if (this.padding_char.length() > 0) {
-                                stringBuilder.append(this.padding_char);
+                                if (stringBuilder.length() > 0) stringBuilder.append(this.padding_char);
+                                if (firstLetters.length() > 0) firstLetters.append(this.padding_char);
                             }
+
+                            stringBuilder.append(first_value);
                             firstLetters.append(first_value.charAt(0));
 
+                            if (this.padding_char.length() > 0) {
+                                stringBuilder.append(this.padding_char);
+                                firstLetters.append(this.padding_char);
+                            }
                         }
                     } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
-                        badHanyuPinyinOutputFormatCombination.printStackTrace();
+                        logger.error("pinyin-tokenizer", badHanyuPinyinOutputFormatCombination);
                     }
                 }
             }
@@ -99,8 +107,7 @@ public class PinyinTokenizer extends Tokenizer {
             } else if (first_letter.equals("append")) {
                 termAtt.append(stringBuilder.toString());
                 if (this.padding_char.length() > 0) {
-                    if(!stringBuilder.toString().endsWith(this.padding_char))
-                    {
+                    if (!stringBuilder.toString().endsWith(this.padding_char)) {
                         termAtt.append(this.padding_char);
                     }
                 }

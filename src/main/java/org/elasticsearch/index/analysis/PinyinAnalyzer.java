@@ -3,8 +3,6 @@ package org.elasticsearch.index.analysis;
 import org.apache.lucene.analysis.Analyzer;
 import org.elasticsearch.common.settings.Settings;
 
-import java.io.Reader;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Medcl'
@@ -23,13 +21,18 @@ public final class PinyinAnalyzer extends Analyzer {
         padding_char = settings.get("padding_char", "");
     }
 
+    public PinyinAnalyzer(String firstLetter, String paddingChar) {
+        first_letter = firstLetter;
+        padding_char = paddingChar;
+    }
+
     @Override
-    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-                    if (first_letter.equals("only")) {
-                        return new TokenStreamComponents(new PinyinAbbreviationsTokenizer(reader));
-                    } else {
-                        return new TokenStreamComponents(new PinyinTokenizer(reader, padding_char, first_letter));
-                    }
+    protected TokenStreamComponents createComponents(String fieldName) {
+        if (first_letter.equals("only")) {
+            return new TokenStreamComponents(new PinyinAbbreviationsTokenizer());
+        } else {
+            return new TokenStreamComponents(new PinyinTokenizer(first_letter, padding_char));
+        }
     }
 
 }

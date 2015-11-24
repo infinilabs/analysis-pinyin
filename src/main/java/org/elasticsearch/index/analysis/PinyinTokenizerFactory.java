@@ -7,27 +7,24 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.settings.IndexSettings;
 
-import java.io.Reader;
-
-/**
- */
 public class PinyinTokenizerFactory extends AbstractTokenizerFactory {
 
-   private String first_letter;
-   private String padding_char;
+    private String first_letter;
+    private String padding_char;
+
     @Inject
     public PinyinTokenizerFactory(Index index, @IndexSettings Settings indexSettings, @Assisted String name, @Assisted Settings settings) {
         super(index, indexSettings, name, settings);
-         first_letter = settings.get("first_letter", "none");
-         padding_char = settings.get("padding_char", "");
+        first_letter = settings.get("first_letter", "none");
+        padding_char = settings.get("padding_char", "");
     }
 
     @Override
-    public Tokenizer create(Reader reader) {
-        if(first_letter.equals("only")){
-            return new PinyinAbbreviationsTokenizer(reader);
-        }else{
-            return new PinyinTokenizer(reader,padding_char,first_letter);
+    public Tokenizer create() {
+        if (first_letter.equals("only")) {
+            return new PinyinAbbreviationsTokenizer();
+        } else {
+            return new PinyinTokenizer(first_letter, padding_char);
         }
     }
 }

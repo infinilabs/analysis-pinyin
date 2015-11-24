@@ -27,6 +27,7 @@
 //import org.apache.lucene.util.Version;
 //import org.elasticsearch.common.inject.Injector;
 //import org.elasticsearch.common.inject.ModulesBuilder;
+//import org.elasticsearch.common.settings.Settings;
 //import org.elasticsearch.common.settings.SettingsModule;
 //import org.elasticsearch.env.Environment;
 //import org.elasticsearch.env.EnvironmentModule;
@@ -42,7 +43,6 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //
-//import static org.elasticsearch.common.settings.ImmutableSettings.Builder.EMPTY_SETTINGS;
 //import static org.hamcrest.Matchers.instanceOf;
 //
 ///**
@@ -53,11 +53,11 @@
 //    public void testPinyinAnalysis() {
 //        Index index = new Index("test");
 //
-//        Injector parentInjector = new ModulesBuilder().add(new SettingsModule(EMPTY_SETTINGS), new EnvironmentModule(new Environment(EMPTY_SETTINGS))).createInjector();
+//        Injector parentInjector = new ModulesBuilder().add(new SettingsModule(Settings.EMPTY), new EnvironmentModule(new Environment(Settings.EMPTY))).createInjector();
 //        Injector injector = new ModulesBuilder().add(
-//                new IndexSettingsModule(index, EMPTY_SETTINGS),
+//                new IndexSettingsModule(index, Settings.EMPTY),
 //                new IndexNameModule(index),
-//                new AnalysisModule(EMPTY_SETTINGS, parentInjector.getInstance(IndicesAnalysisService.class)).addProcessor(new PinyinAnalysisBinderProcessor()))
+//                new AnalysisModule(Settings.EMPTY, parentInjector.getInstance(IndicesAnalysisService.class)).addProcessor(new PinyinAnalysisBinderProcessor()))
 //                .createChildInjector(parentInjector);
 //
 //        AnalysisService analysisService = injector.getInstance(AnalysisService.class);
@@ -75,7 +75,7 @@
 //    @Test
 //    public void testTokenFilter() throws IOException{
 //        StringReader sr = new StringReader("刘德华");
-//        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_41);
+//        Analyzer analyzer = new StandardAnalyzer();
 //        PinyinTokenFilter filter = new PinyinTokenFilter(analyzer.tokenStream("f",sr),"","none");
 //        List<String>  pinyin= new ArrayList<String>();
 //        filter.reset();
@@ -112,7 +112,8 @@
 //            System.out.println(value);
 //            StringReader sr = new StringReader(value);
 //
-//            PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ","none");
+//            PinyinTokenizer tokenizer = new PinyinTokenizer(" ","none");
+//            tokenizer.setReader(sr);
 ////            PinyinTokenizer tokenizer = new PinyinTokenizer(sr, " ", "only");
 ////            PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ","prefix");
 ////              PinyinTokenizer tokenizer = new PinyinTokenizer(sr," ","append");
