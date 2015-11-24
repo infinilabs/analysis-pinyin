@@ -65,7 +65,6 @@ public class PinyinTokenFilter extends TokenFilter {
             if (c < 128) {
                 stringBuilder.append(c);
                 firstLetters.append(c);
-
             } else {
 
                 try {
