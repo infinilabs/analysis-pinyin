@@ -21,6 +21,7 @@ public class PinyinIndicesAnalysis extends AbstractComponent {
                                  IndicesAnalysisService indicesAnalysisService, Environment env) {
         super(settings);
 
+        //analyzers
         indicesAnalysisService.analyzerProviderFactories().put("pinyin_first_letter",
                 new PreBuiltAnalyzerProviderFactory("pinyin_first_letter", AnalyzerScope.GLOBAL,
                         new PinyinAnalyzer("only", "")));
@@ -29,6 +30,7 @@ public class PinyinIndicesAnalysis extends AbstractComponent {
                 new PreBuiltAnalyzerProviderFactory("pinyin", AnalyzerScope.GLOBAL,
                         new PinyinAnalyzer("none", " ")));
 
+        //tokenizers
         indicesAnalysisService.tokenizerFactories().put("pinyin",
                 new PreBuiltTokenizerFactoryFactory(new TokenizerFactory() {
                     @Override
@@ -56,6 +58,7 @@ public class PinyinIndicesAnalysis extends AbstractComponent {
                 }));
 
 
+        //tokenFilters
         indicesAnalysisService.tokenFilterFactories().put("pinyin",
                 new PreBuiltTokenFilterFactoryFactory(new TokenFilterFactory() {
                     @Override
