@@ -9,7 +9,7 @@ public class PinyinConfig {
         onlyFirstLetter(1),
         fullPinyin(2),
         fullPinyinWithSpace(3),
-        supportHomonym(4);
+        supportPolyphony(4);
 
         private final int value;
         Mode(int i) {
