@@ -51,16 +51,16 @@ curl -XPUT http://localhost:9200/medcl/ -d'
 }'
 </pre>
 
-2.Analyzing a chinese name,such as 刘德华
+2.Analyzing a chinese name, such as 刘德华
 <pre>
 http://localhost:9200/medcl/_analyze?text=%e5%88%98%e5%be%b7%e5%8d%8e&analyzer=pinyin_analyzer
 {"tokens":[{"token":"liu de hua ","start_offset":0,"end_offset":3,"type":"word","position":1}]}
 </pre>
 
-3.Thant's all,have fun.
+3.That's all, have fun.
 
 optional config:
-the parameter `first_letter` can be set to: `prefix` , `append` , `only` and `none` ,default value is `none`
+the parameter `first_letter` can be set to: `prefix`, `append`, `only` and `none`, default value is `none`
 
 examples:
 `first_letter` set to`prifix` and  `padding_char` is set to `""`
