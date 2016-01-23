@@ -19,18 +19,21 @@
 
 package org.elasticsearch.index.analysis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
+import junit.framework.TestCase;
 
-public class PinyinTokenFilterTest {
+public class PinyinTokenFilterTest extends TestCase{
 
 	@Test
 	public void testIncrementTokenForNotMatchedOperation() throws IOException {

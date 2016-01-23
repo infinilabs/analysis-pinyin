@@ -21,15 +21,18 @@ package org.elasticsearch.index.analysis;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.elasticsearch.analysis.PinyinConfig;
 import org.junit.Test;
+
 import com.openpojo.reflection.impl.PojoClassFactory;
 import com.openpojo.validation.Validator;
 import com.openpojo.validation.ValidatorBuilder;
 import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
+import junit.framework.TestCase;
 
-public class PojoTest {
+public class PojoTest extends TestCase{
 
 	private Validator validator;
 
