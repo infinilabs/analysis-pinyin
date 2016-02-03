@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.elasticsearch.index.analysis;
 
 import java.util.Arrays;
@@ -32,10 +31,11 @@ import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
 import junit.framework.TestCase;
 
-public class PojoTest extends TestCase{
+public class PojoTest extends TestCase {
 
 	private Validator validator;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void testOpenPojo() {
 		validator = ValidatorBuilder.create().with(new SetterTester()).with(new GetterTester()).build();

@@ -40,6 +40,8 @@
         <elasticsearch.plugin.jvm>true</elasticsearch.plugin.jvm>
         <tests.rest.load_packaged>false</tests.rest.load_packaged>
         <skip.unit.tests>true</skip.unit.tests>
+        <junit.version>4.12</junit.version>
+        <powermock.version>1.6.4</powermock.version>
     </properties>
 
     <repositories>
@@ -82,7 +84,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.3.1</version>
+            <version>6.9.10</version>
             <scope>test</scope>
         </dependency>
 
@@ -103,14 +105,14 @@
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
-            <version>1.6.2</version>
+            <version>${powermock.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
-            <version>1.6.2</version>
+            <version>${powermock.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -131,7 +133,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.9</version>
+            <version>${junit.version}</version>
         </dependency>
     </dependencies>
 
@@ -192,26 +194,11 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.6</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                        <version>5.0.3</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
-                    <check>
-                        true
-                    </check>
-                    <formats>
-                        <format>html</format>
-                        <format>xml</format>
-                    </formats>
-                    <outputDirectory>${project.build.directory}/site/cobertura</outputDirectory>
-                    <instrumentation>
-                        <ignoreTrivial>true</ignoreTrivial>
-                    </instrumentation>
+	                <formats>
+	                  <format>html</format>
+	                  <format>xml</format>
+	                </formats>
                 </configuration>
                 <executions>
                     <execution>
@@ -221,7 +208,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>            
         </plugins>
     </build>
 </project>
