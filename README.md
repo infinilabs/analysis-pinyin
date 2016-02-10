@@ -36,8 +36,8 @@ curl -XPUT http://localhost:9200/medcl/ -d'
             "analyzer" : {
                 "pinyin_analyzer" : {
                     "tokenizer" : "my_pinyin",
-                    "filter" : "word_delimiter
-]                }
+                    "filter" : "word_delimiter"
+                    }
             },
             "tokenizer" : {
                 "my_pinyin" : {
