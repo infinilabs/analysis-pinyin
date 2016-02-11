@@ -16,24 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.elasticsearch.index.analysis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.internal.util.reflection.Whitebox.setInternalState;
+import static org.powermock.api.mockito.PowerMockito.mock;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttributeImpl;
+import org.apache.lucene.util.AttributeFactory;
+import org.apache.lucene.util.AttributeSource.State;
 import org.junit.Test;
+
 import junit.framework.TestCase;
 
-public class PinyinTokenFilterTest extends TestCase{
+public class PinyinTokenFilterTest extends TestCase {
 
 	@Test
 	public void testIncrementTokenForNotMatchedOperation() throws IOException {
@@ -42,7 +51,7 @@ public class PinyinTokenFilterTest extends TestCase{
 
 		// when
 		convertCharSetAndApplyOperation("pinyin", "non-matched-operation", "", piyaniConvertedList);
-
+	
 		// then
 		assertTrue("piyaniConvertedList element must be empty as the operation is not matched",
 				piyaniConvertedList.get(0).isEmpty());
@@ -112,16 +121,45 @@ public class PinyinTokenFilterTest extends TestCase{
 				+ "hua and the append string is 'ad'", "hua adh ad", piyaniConvertedList.get(2));
 	}
 
+	@SuppressWarnings({ "resource" })
 	private void convertCharSetAndApplyOperation(String charSet, String operation, String suffix,
 			List<String> piyaniConvertedList) throws IOException {
 		StringReader sr = new StringReader(charSet);
 		Analyzer analyzer = new StandardAnalyzer();
 		PinyinTokenFilter filter = new PinyinTokenFilter(analyzer.tokenStream("piyanistr", sr), operation, suffix);
-		List<String> pinyin = new ArrayList<String>();
 		filter.reset();
 		while (filter.incrementToken()) {
 			CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
 			piyaniConvertedList.add(ta.toString());
 		}
+	}
+	
+	@SuppressWarnings({ "resource", "rawtypes" })
+	@Test
+	public void testEnd() throws IOException {
+		// given
+		TokenStream tokenStreamMock = mock(TokenStream.class);
+		LinkedHashMap attributesMock = mock(LinkedHashMap.class);
+		LinkedHashMap attributeImplsMock = mock(LinkedHashMap.class);
+		AttributeFactory factoryMock = mock(AttributeFactory.class);
+		CharTermAttributeImpl charTermAttributeImpl = mock(CharTermAttributeImpl.class);
+		OffsetAttributeImpl offsetAttributeImpl = mock(OffsetAttributeImpl.class);
+		
+		doReturn(charTermAttributeImpl).when(factoryMock).createAttributeInstance(CharTermAttribute.class);
+		doReturn(offsetAttributeImpl).when(factoryMock).createAttributeInstance(OffsetAttribute.class);
+		
+		setInternalState(tokenStreamMock, "attributes", attributesMock);
+		setInternalState(tokenStreamMock, "attributeImpls", attributeImplsMock);
+		setInternalState(tokenStreamMock, "factory", factoryMock);
+		setInternalState(tokenStreamMock, "currentState", new State[1]);
+		String first_letter = "append";
+		String padding_char = "ad";
+		PinyinTokenFilter pinyinTokenFilter = new PinyinTokenFilter(tokenStreamMock, first_letter, padding_char);
+		
+		// when
+		pinyinTokenFilter.end();
+		
+		// then
+		verify(tokenStreamMock).end();
 	}
 }
