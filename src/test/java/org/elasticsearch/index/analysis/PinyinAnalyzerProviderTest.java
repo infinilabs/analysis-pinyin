@@ -28,7 +28,7 @@ public class PinyinAnalyzerProviderTest extends TestCase {
 		Index indexMock = mock(Index.class);
 		IndexSettingsService indexSettingsServiceMock = mock(IndexSettingsService.class);
 		PinyinAnalyzer pinyinAnalyzerMock = mock(PinyinAnalyzer.class);
-		Settings settingsMock = mock(Settings.class);
+		Settings settingsMock = Settings.EMPTY;
 		doReturn(settingsMock).when(indexSettingsServiceMock).getSettings();
 		whenNew(PinyinAnalyzer.class).withAnyArguments().thenReturn(pinyinAnalyzerMock);
 		

@@ -29,7 +29,7 @@ public class PinyinIndicesAnalysisTest extends TestCase {
 	@Test
 	public final void testConstructor() {
 		// given
-		Settings settingsMock = mock(Settings.class);
+		Settings settingsMock = Settings.EMPTY;
 		IndicesAnalysisService indicesAnalysisServiceMock = mock(IndicesAnalysisService.class);
 		Environment environmentMock = mock(Environment.class);
 		
