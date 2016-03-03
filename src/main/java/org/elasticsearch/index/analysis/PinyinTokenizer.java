@@ -68,9 +68,13 @@ public class PinyinTokenizer extends Tokenizer {
             StringBuilder firstLetters = new StringBuilder();
             for (int i = 0; i < str.length(); i++) {
                 char c = str.charAt(i);
-                if (c < 128) {
-                    stringBuilder.append(c);
-                    firstLetters.append(c);
+                if (c<128) {
+                    if( (c > 96 && c < 123 ) || (c > 64 && c < 91 )|| (c > 47 && c < 58 )){
+                        stringBuilder.append(c);
+                        firstLetters.append(c);
+                    }else{
+                        stringBuilder.append(" ");
+                    }
                 } else {
                     try {
                         String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
@@ -80,16 +84,11 @@ public class PinyinTokenizer extends Tokenizer {
                             //TODO more than one pinyin
                             if (this.padding_char.length() > 0) {
                                 if (stringBuilder.length() > 0) stringBuilder.append(this.padding_char);
-                                if (firstLetters.length() > 0) firstLetters.append(this.padding_char);
                             }
 
                             stringBuilder.append(first_value);
                             firstLetters.append(first_value.charAt(0));
 
-                            if (this.padding_char.length() > 0) {
-                                stringBuilder.append(this.padding_char);
-                                firstLetters.append(this.padding_char);
-                            }
                         }
                     } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
                         logger.error("pinyin-tokenizer", badHanyuPinyinOutputFormatCombination);
