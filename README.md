@@ -1,4 +1,4 @@
-Pinyin Analysis for ElasticSearch
+Pinyin Analysis for Elasticsearch
 ==================================
 
 The Pinyin Analysis plugin integrates Pinyin4j(http://pinyin4j.sourceforge.net/) module into elasticsearch.
@@ -9,6 +9,8 @@ Pinyin4j is a popular Java library supporting convertion between Chinese charact
     | Pinyin4j   Analysis Plugin    | ElasticSearch  |
     --------------------------------------------------
     | master                        | 2.2.x -> master|
+    --------------------------------------------------
+    | 1.6.1                         | 2.2.1          |
     --------------------------------------------------
     | 1.6.0                         | 2.2.0          |
     --------------------------------------------------
