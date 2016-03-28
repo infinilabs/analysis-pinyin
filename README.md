@@ -6,7 +6,7 @@ The Pinyin Analysis plugin integrates Pinyin4j(http://pinyin4j.sourceforge.net/)
 Pinyin4j is a popular Java library supporting convertion between Chinese characters and most popular Pinyin systems. The output format of pinyin could be customized.
 
     --------------------------------------------------
-    | Pinyin4j   Analysis Plugin    | ElasticSearch  |
+    | Pinyin4j   Analysis Plugin    | Elasticsearch  |
     --------------------------------------------------
     | master                        | 2.2.x -> master|
     --------------------------------------------------
