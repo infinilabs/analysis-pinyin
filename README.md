@@ -3,14 +3,14 @@ Pinyin Analysis for Elasticsearch
 
 The Pinyin Analysis plugin integrates Pinyin4j(http://pinyin4j.sourceforge.net/) module into elasticsearch.
 
-Pinyin4j is a popular Java library supporting convertion between Chinese characters and most popular Pinyin systems. The output format of pinyin could be customized.
+Pinyin4j is a popular Java library supporting conversion between Chinese characters and most popular Pinyin systems. The output format of pinyin could be customized.
 
     --------------------------------------------------
     | Pinyin4j   Analysis Plugin    | Elasticsearch  |
     --------------------------------------------------
     | master                        | 2.3.x -> master|
     --------------------------------------------------
-    | 1.7.0                         | 2.3.0          |
+    | 1.7.1                         | 2.3.1          |
     --------------------------------------------------
     | 1.6.1                         | 2.2.1          |
     --------------------------------------------------
@@ -23,12 +23,6 @@ Pinyin4j is a popular Java library supporting convertion between Chinese charact
     | 1.3.0                         | 1.6.x          |
     --------------------------------------------------
     | 1.2.2                         | 1.0.x          |
-    --------------------------------------------------
-    | 1.2.0                         | 0.90.x         |
-    --------------------------------------------------
-    | 1.1.2                         | 0.20.x         |
-    --------------------------------------------------
-    | 1.1.1                         | 0.19.x         |
     --------------------------------------------------
 
 The plugin includes two analyzers: `pinyin` and  `pinyin_first_letter`  , two tokenizers: `pinyin` and `pinyin_first_letter` and two token-filters:  `pinyin` and  `pinyin_first_letter`.
