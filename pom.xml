@@ -6,10 +6,24 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.elasticsearch</groupId>
     <artifactId>elasticsearch-analysis-pinyin</artifactId>
-    <version>1.7.5</version>
+    <version>${elasticsearch.version}</version>
     <packaging>jar</packaging>
     <description>Pinyin Analysis for Elasticsearch</description>
     <inceptionYear>2012</inceptionYear>
+
+    <properties>
+        <elasticsearch.version>5.0.0-alpha5</elasticsearch.version>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <elasticsearch.assembly.descriptor>${project.basedir}/src/main/assemblies/plugin.xml</elasticsearch.assembly.descriptor>
+        <elasticsearch.plugin.name>analysis-pinyin</elasticsearch.plugin.name>
+        <elasticsearch.plugin.classname>org.elasticsearch.plugin.analysis.pinyin.AnalysisPinyinPlugin</elasticsearch.plugin.classname>
+        <elasticsearch.plugin.jvm>true</elasticsearch.plugin.jvm>
+        <tests.rest.load_packaged>false</tests.rest.load_packaged>
+        <skip.unit.tests>true</skip.unit.tests>
+        <gpg.keyname>4E899B30</gpg.keyname>
+        <gpg.useagent>true</gpg.useagent>
+    </properties>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -40,19 +54,6 @@
         <version>7</version>
     </parent>
 
-    <properties>
-        <elasticsearch.version>2.3.5</elasticsearch.version>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <elasticsearch.assembly.descriptor>${project.basedir}/src/main/assemblies/plugin.xml</elasticsearch.assembly.descriptor>
-        <elasticsearch.plugin.name>analysis-pinyin</elasticsearch.plugin.name>
-        <elasticsearch.plugin.classname>org.elasticsearch.plugin.analysis.pinyin.AnalysisPinyinPlugin</elasticsearch.plugin.classname>
-        <elasticsearch.plugin.jvm>true</elasticsearch.plugin.jvm>
-        <tests.rest.load_packaged>false</tests.rest.load_packaged>
-        <skip.unit.tests>true</skip.unit.tests>
-        <gpg.keyname>4E899B30</gpg.keyname>
-        <gpg.useagent>true</gpg.useagent>
-    </properties>
-
     <repositories>
         <repository>
             <id>oss.sonatype.org</id>
@@ -69,10 +70,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.sourceforge.pinyin4j</groupId>
-            <artifactId>pinyin4j</artifactId>
-            <version>2.5.0</version>
-            <systemPath>${basedir}/lib/pinyin4j-2.5.0.jar</systemPath>
+            <groupId>org.nlpcn</groupId>
+            <artifactId>nlp-lang</artifactId>
+            <version>1.7</version>
+            <systemPath>${basedir}/lib/nlp-lang-1.7.jar</systemPath>
             <scope>system</scope>
         </dependency>
 
@@ -145,10 +146,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${maven.compiler.target}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -184,39 +185,6 @@
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.6</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                        <version>5.0.3</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <check>
-                        true
-                    </check>
-                    <formats>
-                        <format>html</format>
-                        <format>xml</format>
-                    </formats>
-                    <outputDirectory>${project.build.directory}/site/cobertura</outputDirectory>
-                    <instrumentation>
-                        <ignoreTrivial>true</ignoreTrivial>
-                    </instrumentation>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>cobertura</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -263,10 +231,10 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>2.3.2</version>
+                        <version>3.5.1</version>
                         <configuration>
-                            <source>1.8</source>
-                            <target>1.8</target>
+                            <source>${maven.compiler.target}</source>
+                            <target>${maven.compiler.target}</target>
                         </configuration>
                     </plugin>
                     <plugin>
