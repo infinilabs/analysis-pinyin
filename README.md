@@ -29,6 +29,18 @@ This Pinyin Analysis plugin is used to do conversion between Chinese characters 
 
 The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:  `pinyin`.
 
+** Optional Parameters ** 
+* `keep_first_letter` when this option enabled,  eg: `刘德华`>`ldh`, default: true
+* `limit_first_letter_length` set max length of the first_letter result, default: 16
+* `keep_none_chinese_in_first_letter` keep non Chinese letters in first letter, eg: `刘德华AT2016`->`ldhat2016`, default: true
+* `keep_full_pinyin` when this option enabled, eg: `刘德华`> [`liu`,`de`,`hua`], default: true
+* `keep_none_chinese` keep non chinese letter or number in result, default: true
+* `keep_original` when this option enabled, will keep original input as well, default: true
+* `lowercase`  lowercase non Chinese letters, default: true
+* `trim_whitespace` default: true
+
+
+
 1.Create a index with custom pinyin analyzer
 <pre>
 curl -XPUT http://localhost:9200/medcl/ -d'
@@ -138,7 +150,7 @@ http://localhost:9200/medcl/folks/_search?q=name:%E5%88%98%E5%BE%B7%E5%8D%8E
 curl http://localhost:9200/medcl/folks/_search?q=name.pinyin:%e5%88%98%e5%be%b7
 curl http://localhost:9200/medcl/folks/_search?q=name.pinyin:liu
 curl http://localhost:9200/medcl/folks/_search?q=name.pinyin:ldh
-curl http://localhost:9200/medcl/folks/_search?q=name.pinyin:dehua
+curl http://localhost:9200/medcl/folks/_search?q=name.pinyin:de+hua
 </pre>
 
 6.Using Pinyin-TokenFilter
