@@ -100,7 +100,7 @@ public class PinyinTokenFilter extends TokenFilter {
                 } else {
 
                     String pinyin = pinyinList.get(i);
-                    if (pinyin != null) {
+                    if (pinyin != null&&pinyin.length()>0) {
 
                         firstLetters.append(pinyin.charAt(0));
 

@@ -91,7 +91,7 @@ public class PinyinTokenizer extends Tokenizer {
                     } else {
 
                         String pinyin = pinyinList.get(i);
-                        if (pinyin != null) {
+                        if (pinyin != null&&pinyin.length()>0) {
 
                             firstLetters.append(pinyin.charAt(0));
 

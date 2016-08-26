@@ -346,4 +346,15 @@ public class PinyinAnalysisTests {
         }
         return result;
     }
+
+//    @Test
+//    public void TestPinyinFunction() {
+//        List<String> result = Pinyin.pinyin("貌美如誮");
+//        for (int i = 0; i < result.size(); i++) {
+//            String s = result.get(i);
+//            System.out.println(s);
+//        }
+//    }
+
+
 }
