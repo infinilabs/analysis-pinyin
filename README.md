@@ -37,6 +37,7 @@ The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:
 * `keep_none_chinese_in_first_letter` keep non Chinese letters in first letter, eg: `刘德华AT2016`->`ldhat2016`, default: true
 * `keep_full_pinyin` when this option enabled, eg: `刘德华`> [`liu`,`de`,`hua`], default: true
 * `keep_none_chinese` keep non chinese letter or number in result, default: true
+* `keep_none_chinese_together` keep non chinese letter together, default: true, eg: `DJ音乐家` -> `DJ`,`yin`,`yue`,`jia`
 * `keep_original` when this option enabled, will keep original input as well, default: true
 * `lowercase`  lowercase non Chinese letters, default: true
 * `trim_whitespace` default: true

@@ -215,14 +215,12 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("ldh", re.get(4));
 
         re = result.get("刘德华A1");
-        Assert.assertEquals(7, re.size());
+        Assert.assertEquals(5, re.size());
         Assert.assertEquals("liu", re.get(0));
         Assert.assertEquals("de", re.get(1));
         Assert.assertEquals("hua", re.get(2));
-        Assert.assertEquals("a", re.get(3));
-        Assert.assertEquals("1", re.get(4));
-        Assert.assertEquals("刘德华A1", re.get(5));
-        Assert.assertEquals("ldha1", re.get(6));
+        Assert.assertEquals("刘德华A1", re.get(3));
+        Assert.assertEquals("ldha1", re.get(4));
 
         re = result.get("讲话频率小，不能发高音");
         Assert.assertEquals(12, re.size());
@@ -261,14 +259,13 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("ajsn", re.get(5));
 
         re = result.get("DJ音乐家");
-        Assert.assertEquals(7, re.size());
-        Assert.assertEquals("d", re.get(0));
-        Assert.assertEquals("j", re.get(1));
-        Assert.assertEquals("yin", re.get(2));
-        Assert.assertEquals("yue", re.get(3));
-        Assert.assertEquals("jia", re.get(4));
-        Assert.assertEquals("DJ音乐家", re.get(5));
-        Assert.assertEquals("djyyj", re.get(6));
+        Assert.assertEquals(6, re.size());
+        Assert.assertEquals("dj", re.get(0));
+        Assert.assertEquals("yin", re.get(1));
+        Assert.assertEquals("yue", re.get(2));
+        Assert.assertEquals("jia", re.get(3));
+        Assert.assertEquals("DJ音乐家", re.get(4));
+        Assert.assertEquals("djyyj", re.get(5));
     }
 
     @Test
@@ -282,6 +279,8 @@ public class PinyinAnalysisTests {
         config.keepNoneChinese = true;
         config.keepOriginal = false;
         config.keepFullPinyin = false;
+        config.keepNoneChineseTogether = false;
+
         HashMap<String, ArrayList<String>> result = getStringArrayListHashMap(s, config);
 
         ArrayList<String> re = result.get("刘德华");
@@ -304,11 +303,25 @@ public class PinyinAnalysisTests {
         config.keepNoneChinese = false;
         config.keepOriginal = false;
         config.keepFullPinyin = false;
+        config.keepNoneChineseTogether = false;
+
         result = getStringArrayListHashMap(s, config);
 
         re = result.get("DJ音乐家");
         Assert.assertEquals(1, re.size());
         Assert.assertEquals("yyj", re.get(0));
+
+        config = new PinyinConfig();
+        config.keepFirstLetter = true;
+        config.keepNoneChineseTogether = true;
+        config.keepOriginal = false;
+        config.keepFullPinyin = false;
+        result = getStringArrayListHashMap(s, config);
+
+        re = result.get("DJ音乐家");
+        Assert.assertEquals(2, re.size());
+        Assert.assertEquals("dj", re.get(0));
+        Assert.assertEquals("djyyj", re.get(1));
     }
 
     @Test

@@ -84,13 +84,19 @@ public class PinyinTokenFilter extends TokenFilter {
 
             List<String> pinyinList = Pinyin.pinyin(source);
 
+            StringBuffer buff=new StringBuffer();
+
             for (int i = 0; i < source.length(); i++) {
                 char c = source.charAt(i);
                 //keep original alphabet
                 if (c < 128) {
                     if ((c > 96 && c < 123) || (c > 64 && c < 91) || (c > 47 && c < 58)) {
                         if (config.keepNoneChinese) {
-                            candidate.add(String.valueOf(c));
+                            if(config.keepNoneChineseTogether){
+                                buff.append(c);
+                            }else{
+                                candidate.add(String.valueOf(c));
+                            }
                         }
                         if(config.keepNoneChineseInFirstLetter)
                         {
@@ -98,6 +104,11 @@ public class PinyinTokenFilter extends TokenFilter {
                         }
                     }
                 } else {
+                    //clean previous temp
+                    if(buff.length()>0){
+                        candidate.add(buff.toString());
+                        buff=new StringBuffer();
+                    }
 
                     String pinyin = pinyinList.get(i);
                     if (pinyin != null&&pinyin.length()>0) {
