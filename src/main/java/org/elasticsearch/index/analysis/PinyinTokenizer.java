@@ -124,9 +124,9 @@ public class PinyinTokenizer extends Tokenizer {
                                         addCandidate(new TermItem(String.valueOf(c), i, i + 1));
                                     }
                                 }
-                                if (config.keepNoneChineseInFirstLetter) {
-                                    firstLetters.append(c);
-                                }
+                            }
+                            if (config.keepNoneChineseInFirstLetter) {
+                                firstLetters.append(c);
                             }
                         }
                     } else {
@@ -193,14 +193,17 @@ public class PinyinTokenizer extends Tokenizer {
     }
 
     private int parseBuff(StringBuilder buff, int buffSize) {
-        if(config.noneChinesePinyinTokenize){
-            List<String> result = PinyinAlphabetTokenizer.walk(buff.toString());
-            for (int i = 0; i < result.size(); i++) {
-                addCandidate(new TermItem(result.get(i), lastPosition - buffSize, lastPosition));
+        if (config.keepNoneChinese) {
+            if(config.noneChinesePinyinTokenize){
+                List<String> result = PinyinAlphabetTokenizer.walk(buff.toString());
+                for (int i = 0; i < result.size(); i++) {
+                    addCandidate(new TermItem(result.get(i), lastPosition - buffSize, lastPosition));
+                }
+            }else{
+                addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));
             }
-        }else{
-            addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));
         }
+
         buff.setLength(0);
         buffSize = 0;
         return buffSize;

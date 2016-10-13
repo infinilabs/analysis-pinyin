@@ -56,7 +56,7 @@ public class PinyinTokenFilter extends TokenFilter {
     public final boolean incrementToken() throws IOException {
 
 
-        if(!done){
+        if (!done) {
             if (readTerm()) return true;
         }
 
@@ -65,7 +65,7 @@ public class PinyinTokenFilter extends TokenFilter {
             if (!input.incrementToken()) {
                 return false;
             }
-            done=false;
+            done = false;
         }
         readTerm();
         return true;
@@ -84,7 +84,7 @@ public class PinyinTokenFilter extends TokenFilter {
 
             List<String> pinyinList = Pinyin.pinyin(source);
 
-            StringBuilder buff=new StringBuilder();
+            StringBuilder buff = new StringBuilder();
 
             for (int i = 0; i < source.length(); i++) {
                 char c = source.charAt(i);
@@ -92,28 +92,27 @@ public class PinyinTokenFilter extends TokenFilter {
                 if (c < 128) {
                     if ((c > 96 && c < 123) || (c > 64 && c < 91) || (c > 47 && c < 58)) {
                         if (config.keepNoneChinese) {
-                            if(config.keepNoneChineseTogether){
+                            if (config.keepNoneChineseTogether) {
                                 buff.append(c);
-                            }else{
+                            } else {
                                 candidate.add(String.valueOf(c));
                             }
                         }
-                        if(config.keepNoneChineseInFirstLetter)
-                        {
+                        if (config.keepNoneChineseInFirstLetter) {
                             firstLetters.append(c);
                         }
                     }
                 } else {
                     //clean previous temp
-                    if(buff.length()>0){
+                    if (buff.length() > 0) {
                         cleanBuff(buff);
                     }
 
                     String pinyin = pinyinList.get(i);
-                    if (pinyin != null&&pinyin.length()>0) {
+                    if (pinyin != null && pinyin.length() > 0) {
 
                         firstLetters.append(pinyin.charAt(0));
-                        if(config.keepSeparateFirstLetter&pinyin.length()>1){
+                        if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
                             candidate.add(String.valueOf(pinyin.charAt(0)));
                         }
                         if (config.keepFullPinyin) {
@@ -124,7 +123,7 @@ public class PinyinTokenFilter extends TokenFilter {
             }
 
             //clean previous temp
-            if(buff.length()>0){
+            if (buff.length() > 0) {
                 cleanBuff(buff);
             }
         }
@@ -162,7 +161,7 @@ public class PinyinTokenFilter extends TokenFilter {
             if (config.lowercase) {
                 fl = fl.toLowerCase();
             }
-            if(!(config.keepSeparateFirstLetter&&fl.length()<=1)){
+            if (!(config.keepSeparateFirstLetter && fl.length() <= 1)) {
                 termAtt.setEmpty();
                 termAtt.append(fl);
                 termAtt.setLength(fl.length());
@@ -176,14 +175,16 @@ public class PinyinTokenFilter extends TokenFilter {
     }
 
     private void cleanBuff(StringBuilder buff) {
-        if(config.noneChinesePinyinTokenize){
-            List<String> temp = PinyinAlphabetTokenizer.walk(buff.toString());
-            for (int j = 0; j < temp.size(); j++) {
-                String tmp = temp.get(j);
-                candidate.add(tmp);
+        if (config.keepNoneChinese) {
+            if (config.noneChinesePinyinTokenize) {
+                List<String> temp = PinyinAlphabetTokenizer.walk(buff.toString());
+                for (int j = 0; j < temp.size(); j++) {
+                    String tmp = temp.get(j);
+                    candidate.add(tmp);
+                }
+            } else {
+                candidate.add(buff.toString());
             }
-        }else{
-            candidate.add(buff.toString());
         }
 
         buff.setLength(0);

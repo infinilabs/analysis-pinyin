@@ -265,7 +265,7 @@ public class PinyinAnalysisTests {
                 {"刘德华"
                         , "劉德華", "刘德华A1",
                         "讲话频率小，不能发高音", "T波低平或倒置", "β-氨基酸尿",
-                        "DJ音乐家", "人生一大乐事, 哈哈"
+                        "DJ音乐家", "人生一大乐事, 哈哈",
                 };
 
         PinyinConfig config = new PinyinConfig();
@@ -344,8 +344,7 @@ public class PinyinAnalysisTests {
 
 
         String[] s1 =
-                {"刘德华", "刘 de 华"
-                };
+                {"刘德华", "刘 de 华"};
         config = new PinyinConfig();
         config.keepFirstLetter = true;
         config.keepSeparateFirstLetter = true;
@@ -389,6 +388,22 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("d", re.get(2).term);
         Assert.assertEquals("de", re.get(3).term);
         Assert.assertEquals("wdd", re.get(4).term);
+
+        s1 = new String[]{"lu金 s刘德华 张学友 郭富城 黎明 四大lao天王liudehua"};
+        config = new PinyinConfig();
+        config.keepFirstLetter=true;
+        config.keepFullPinyin=false;
+        config.keepNoneChinese=false;
+        config.keepNoneChineseTogether=true;
+        config.noneChinesePinyinTokenize=true;
+        config.keepNoneChineseInFirstLetter=true;
+        config.keepOriginal=false;
+        config.lowercase=true;
+        config.trimWhitespace=true;
+
+        result = getStringArrayListHashMap(s1, config);
+
+        re = result.get("lu金 s刘德华 张学友 郭富城 黎明 四大lao天王liudehua");
     }
 
     @Test
@@ -424,6 +439,7 @@ public class PinyinAnalysisTests {
         config = new PinyinConfig();
         config.keepFirstLetter = true;
         config.keepNoneChinese = false;
+        config.keepNoneChineseInFirstLetter = false;
         config.keepOriginal = false;
         config.keepFullPinyin = false;
         config.keepNoneChineseTogether = false;
@@ -436,6 +452,8 @@ public class PinyinAnalysisTests {
 
         config = new PinyinConfig();
         config.keepFirstLetter = true;
+        config.keepNoneChinese=true;
+        config.keepNoneChineseInFirstLetter = true;
         config.keepNoneChineseTogether = true;
         config.keepOriginal = false;
         config.keepFullPinyin = false;
@@ -572,6 +590,15 @@ public class PinyinAnalysisTests {
         }
         Assert.assertEquals("a", result.get(0));
         Assert.assertEquals("123", result.get(1));
+
+        str ="liudehua";
+        result = PinyinAlphabetTokenizer.walk(str);
+        for (int i = 0; i < result.size(); i++) {
+            System.out.println(result.get(i));
+        }
+        Assert.assertEquals("liu", result.get(0));
+        Assert.assertEquals("de", result.get(1));
+        Assert.assertEquals("hua", result.get(2));
     }
 
 

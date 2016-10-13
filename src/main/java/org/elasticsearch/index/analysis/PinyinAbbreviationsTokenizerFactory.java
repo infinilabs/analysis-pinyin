@@ -16,9 +16,13 @@ public class PinyinAbbreviationsTokenizerFactory extends AbstractTokenizerFactor
     public Tokenizer create() {
         PinyinConfig config=new PinyinConfig();
         config.keepFirstLetter=true;
-        config.keepNoneChinese=false;
-        config.keepOriginal=false;
         config.keepFullPinyin=false;
+        config.keepNoneChinese=false;
+        config.keepNoneChineseTogether=true;
+        config.noneChinesePinyinTokenize=false;
+        config.keepOriginal=false;
+        config.lowercase=true;
+        config.trimWhitespace=true;
         config.keepNoneChineseInFirstLetter=true;
         return new PinyinTokenizer(config);
     }

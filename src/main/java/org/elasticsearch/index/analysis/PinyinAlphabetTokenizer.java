@@ -46,12 +46,16 @@ public class PinyinAlphabetTokenizer {
                 }
             }
 
-            //final cleanup
+            //cleanup
             if(lastWord){
                 parse(candidates,buffer);
-            }else{
+            }
+
+            //final cleanup
+            if(buffer.length()>0){
                 candidates.add(buffer.toString());
             }
+
             return candidates;
         }
 
