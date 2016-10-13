@@ -204,6 +204,7 @@ public class PinyinTokenFilter extends TokenFilter {
         this.processedFirstLetter = false;
         this.processedOriginal = false;
         firstLetters.setLength(0);
+        candidate.clear();
         source = null;
     }
 

@@ -224,6 +224,7 @@ public class PinyinTokenizer extends Tokenizer {
         this.processedOriginal = false;
         firstLetters.setLength(0);
         termsFilter.clear();
+        candidate.clear();
         source = null;
     }
 
