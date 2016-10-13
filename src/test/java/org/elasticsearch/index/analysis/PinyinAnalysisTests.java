@@ -270,6 +270,7 @@ public class PinyinAnalysisTests {
 
         PinyinConfig config = new PinyinConfig();
         config.noneChinesePinyinTokenize=false;
+        config.keepOriginal=true;
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
         ArrayList<TermItem> re = result.get("刘德华");

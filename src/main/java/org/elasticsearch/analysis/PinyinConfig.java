@@ -11,7 +11,7 @@ public class PinyinConfig {
     public boolean trimWhitespace=true;
     public boolean keepNoneChinese=true;
     public boolean keepNoneChineseInFirstLetter =true;
-    public boolean keepOriginal=true;
+    public boolean keepOriginal=false;
     public boolean keepFirstLetter=true;
     public boolean keepSeparateFirstLetter=false;
     public boolean keepNoneChineseTogether=true;
@@ -28,7 +28,7 @@ public class PinyinConfig {
         this.keepNoneChinese=settings.getAsBoolean("keep_none_chinese",true);
         this.keepNoneChineseTogether=settings.getAsBoolean("keep_none_chinese_together",true);
         this.noneChinesePinyinTokenize =settings.getAsBoolean("none_chinese_pinyin_tokenize",true);
-        this.keepOriginal=settings.getAsBoolean("keep_original", true);
+        this.keepOriginal=settings.getAsBoolean("keep_original", false);
         this.LimitFirstLetterLength=settings.getAsInt("limit_first_letter_length", 16);
         this.lowercase=settings.getAsBoolean("lowercase", true);
         this.trimWhitespace=settings.getAsBoolean("trim_whitespace", true);
