@@ -84,7 +84,7 @@ public class PinyinTokenFilter extends TokenFilter {
 
             List<String> pinyinList = Pinyin.pinyin(source);
 
-            StringBuffer buff=new StringBuffer();
+            StringBuilder buff=new StringBuilder();
 
             for (int i = 0; i < source.length(); i++) {
                 char c = source.charAt(i);
@@ -107,14 +107,16 @@ public class PinyinTokenFilter extends TokenFilter {
                     //clean previous temp
                     if(buff.length()>0){
                         candidate.add(buff.toString());
-                        buff=new StringBuffer();
+                        buff.setLength(0);
                     }
 
                     String pinyin = pinyinList.get(i);
                     if (pinyin != null&&pinyin.length()>0) {
 
                         firstLetters.append(pinyin.charAt(0));
-
+                        if(config.keepSeparateFirstLetter&pinyin.length()>1){
+                            candidate.add(String.valueOf(pinyin.charAt(0)));
+                        }
                         if (config.keepFullPinyin) {
                             candidate.add(pinyin);
                         }
@@ -122,6 +124,11 @@ public class PinyinTokenFilter extends TokenFilter {
                 }
             }
 
+            //clean previous temp
+            if(buff.length()>0){
+                candidate.add(buff.toString());
+                buff.setLength(0);
+            }
         }
 
 
@@ -157,12 +164,15 @@ public class PinyinTokenFilter extends TokenFilter {
             if (config.lowercase) {
                 fl = fl.toLowerCase();
             }
-            termAtt.setEmpty();
-            termAtt.append(fl);
-            termAtt.setLength(fl.length());
-            done=true;
-            return true;
+            if(!(config.keepSeparateFirstLetter&&fl.length()<=1)){
+                termAtt.setEmpty();
+                termAtt.append(fl);
+                termAtt.setLength(fl.length());
+                return true;
+            }
+
         }
+
         done = true;
         return false;
     }
@@ -180,7 +190,7 @@ public class PinyinTokenFilter extends TokenFilter {
         this.processedCandidate = false;
         this.processedFirstLetter = false;
         this.processedOriginal = false;
-        firstLetters = new StringBuilder();
+        firstLetters.setLength(0);
         source = null;
     }
 
