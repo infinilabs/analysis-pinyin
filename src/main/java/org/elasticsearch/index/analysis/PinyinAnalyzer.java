@@ -1,6 +1,7 @@
 package org.elasticsearch.index.analysis;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.elasticsearch.analysis.PinyinConfig;
 import org.elasticsearch.common.settings.Settings;
 
 /**
@@ -11,28 +12,15 @@ import org.elasticsearch.common.settings.Settings;
  */
 public final class PinyinAnalyzer extends Analyzer {
 
+    private PinyinConfig config;
 
-    private String padding_char;
-    private String first_letter;
-
-
-    public PinyinAnalyzer(Settings settings) {
-        first_letter = settings.get("first_letter", "none");
-        padding_char = settings.get("padding_char", "");
-    }
-
-    public PinyinAnalyzer(String firstLetter, String paddingChar) {
-        first_letter = firstLetter;
-        padding_char = paddingChar;
+    public PinyinAnalyzer(PinyinConfig config) {
+        this.config=config;
     }
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
-        if (first_letter.equals("only")) {
-            return new TokenStreamComponents(new PinyinAbbreviationsTokenizer());
-        } else {
-            return new TokenStreamComponents(new PinyinTokenizer(first_letter, padding_char));
-        }
+            return new TokenStreamComponents(new PinyinTokenizer(config));
     }
 
 }

@@ -7,9 +7,9 @@ package org.elasticsearch.index.analysis;
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,116 +17,202 @@ package org.elasticsearch.index.analysis;
  * limitations under the License.
  */
 
-import net.sourceforge.pinyin4j.PinyinHelper;
-import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
-import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
-import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
-import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
-import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.elasticsearch.common.logging.ESLogger;
-import org.elasticsearch.common.logging.ESLoggerFactory;
+import org.elasticsearch.analysis.PinyinConfig;
+import org.nlpcn.commons.lang.pinyin.Pinyin;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PinyinTokenFilter extends TokenFilter {
 
-    private final ESLogger logger = ESLoggerFactory.getLogger("pinyin-analyzer");
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-    private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
-    private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-    private String padding_char;
-    private String first_letter;
+    private boolean done = true;
+    private boolean processedCandidate = false;
+    private boolean processedFirstLetter = false;
+    private boolean processedOriginal = false;
+    protected int position = 0;
+    protected int lastPosition = 0;
+    private PinyinConfig config;
+    List<String> candidate;
+    StringBuilder firstLetters;
+    String source;
 
-    public PinyinTokenFilter(TokenStream in, String first_letter, String padding_char) {
+    public PinyinTokenFilter(TokenStream in, PinyinConfig config) {
         super(in);
-        this.padding_char = padding_char;
-        this.first_letter = first_letter;
-        format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        format.setVCharType(HanyuPinyinVCharType.WITH_V);
+        this.config = config;
+        //validate config
+        if (!(config.keepFirstLetter || config.keepFullPinyin)) {
+            throw new ConfigErrorException("pinyin config error, can't disable first_letter and full_pinyin at the same time.");
+        }
+        candidate = new ArrayList<>();
+        firstLetters = new StringBuilder();
     }
 
     @Override
     public final boolean incrementToken() throws IOException {
 
-        if (!input.incrementToken()) {
-            return false;
-        }
-        final char[] buffer = termAtt.buffer();
-        final int bufferLength = termAtt.length();
-        StringBuilder stringBuilder = new StringBuilder();
-        StringBuilder firstLetters = new StringBuilder();
-        for (int i = 0; i < bufferLength; i++) {
-            char c = buffer[i];
-            if (c < 128) {
-                stringBuilder.append(c);
-                firstLetters.append(c);
-            } else {
 
-                try {
-                    String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
-                    if (strs != null) {
-                        //get first result by default
-                        String first_value = strs[0];
-                        //TODO more than one pinyin
-                        if (this.padding_char.length() > 0) {
-                            if (stringBuilder.length() > 0) stringBuilder.append(this.padding_char);
-                            if (firstLetters.length() > 0) firstLetters.append(this.padding_char);
-                        }
-                        stringBuilder.append(first_value);
-                        firstLetters.append(first_value.charAt(0));
-                        if (this.padding_char.length() > 0) {
-                            stringBuilder.append(this.padding_char);
-                            firstLetters.append(this.padding_char);
-                        }
-                    }
-                } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
-                    logger.error("pinyin-filter", badHanyuPinyinOutputFormatCombination);
-                }
-            }
+        if (!done) {
+            if (readTerm()) return true;
         }
 
-
-        StringBuilder pinyinStringBuilder = new StringBuilder();
-        if (first_letter.equals("prefix")) {
-            pinyinStringBuilder.append(firstLetters.toString());
-            if (this.padding_char.length() > 0) {
-                pinyinStringBuilder.append(this.padding_char); //TODO splitter
+        if (done) {
+            resetVariable();
+            if (!input.incrementToken()) {
+                return false;
             }
-            pinyinStringBuilder.append(stringBuilder.toString());
-        } else if (first_letter.equals("append")) {
-            pinyinStringBuilder.append(stringBuilder.toString());
-            if (this.padding_char.length() > 0) {
-                if (!stringBuilder.toString().endsWith(this.padding_char)) {//TODO
-                    pinyinStringBuilder.append(this.padding_char);
-                }
-            }
-            pinyinStringBuilder.append(firstLetters.toString());
-        } else if (first_letter.equals("none")) {
-            pinyinStringBuilder.append(stringBuilder.toString());
-        } else if (first_letter.equals("only")) {
-            pinyinStringBuilder.append(firstLetters.toString());
+            done = false;
         }
-        termAtt.setEmpty();
-        termAtt.resizeBuffer(pinyinStringBuilder.length());
-        termAtt.append(pinyinStringBuilder);
-        termAtt.setLength(pinyinStringBuilder.length());
+        readTerm();
         return true;
     }
 
+    private boolean readTerm() {
+        if (!processedCandidate) {
+            processedCandidate = true;
+            final int bufferLength = termAtt.length();
+            source = termAtt.toString();
+            lastPosition = bufferLength;
+            source = termAtt.toString();
+            if (config.trimWhitespace) {
+                source = source.trim();
+            }
+
+            List<String> pinyinList = Pinyin.pinyin(source);
+
+            StringBuilder buff = new StringBuilder();
+
+            for (int i = 0; i < source.length(); i++) {
+                char c = source.charAt(i);
+                //keep original alphabet
+                if (c < 128) {
+                    if ((c > 96 && c < 123) || (c > 64 && c < 91) || (c > 47 && c < 58)) {
+                        if (config.keepNoneChinese) {
+                            if (config.keepNoneChineseTogether) {
+                                buff.append(c);
+                            } else {
+                                candidate.add(String.valueOf(c));
+                            }
+                        }
+                        if (config.keepNoneChineseInFirstLetter) {
+                            firstLetters.append(c);
+                        }
+                    }
+                } else {
+                    //clean previous temp
+                    if (buff.length() > 0) {
+                        cleanBuff(buff);
+                    }
+
+                    String pinyin = pinyinList.get(i);
+                    if (pinyin != null && pinyin.length() > 0) {
+
+                        firstLetters.append(pinyin.charAt(0));
+                        if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
+                            candidate.add(String.valueOf(pinyin.charAt(0)));
+                        }
+                        if (config.keepFullPinyin) {
+                            candidate.add(pinyin);
+                        }
+                    }
+                }
+            }
+
+            //clean previous temp
+            if (buff.length() > 0) {
+                cleanBuff(buff);
+            }
+        }
+
+
+        if (position < candidate.size()) {
+            String s = candidate.get(position);
+            if (config.lowercase) {
+                s = s.toLowerCase();
+            }
+            termAtt.setEmpty();
+            termAtt.append(s);
+            position++;
+            return true;
+        }
+
+
+        if (config.keepOriginal && !processedOriginal) {
+            processedOriginal = true;
+            termAtt.setEmpty();
+            termAtt.append(source);
+            termAtt.setLength(source.length());
+            return true;
+        }
+
+
+        if (config.keepFirstLetter && firstLetters.length() > 0 && !processedFirstLetter) {
+            processedFirstLetter = true;
+            String fl;
+            if (firstLetters.length() > config.LimitFirstLetterLength && config.LimitFirstLetterLength > 0) {
+                fl = firstLetters.substring(0, config.LimitFirstLetterLength);
+            } else {
+                fl = firstLetters.toString();
+            }
+            if (config.lowercase) {
+                fl = fl.toLowerCase();
+            }
+            if (!(config.keepSeparateFirstLetter && fl.length() <= 1)) {
+                termAtt.setEmpty();
+                termAtt.append(fl);
+                termAtt.setLength(fl.length());
+                return true;
+            }
+
+        }
+
+        done = true;
+        return false;
+    }
+
+    private void cleanBuff(StringBuilder buff) {
+        if (config.keepNoneChinese) {
+            if (config.noneChinesePinyinTokenize) {
+                List<String> temp = PinyinAlphabetTokenizer.walk(buff.toString());
+                for (int j = 0; j < temp.size(); j++) {
+                    String tmp = temp.get(j);
+                    candidate.add(tmp);
+                }
+            } else {
+                candidate.add(buff.toString());
+            }
+        }
+
+        buff.setLength(0);
+    }
+
+
     @Override
     public final void end() throws IOException {
-        // set final offset
         super.end();
+    }
+
+    void resetVariable() {
+        position = 0;
+        lastPosition = 0;
+        candidate.clear();
+        this.processedCandidate = false;
+        this.processedFirstLetter = false;
+        this.processedOriginal = false;
+        firstLetters.setLength(0);
+        source = null;
+        candidate.clear();
     }
 
     @Override
     public void reset() throws IOException {
         super.reset();
+        this.done = true;
+        resetVariable();
     }
 
 

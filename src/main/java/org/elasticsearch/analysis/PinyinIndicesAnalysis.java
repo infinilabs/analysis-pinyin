@@ -21,14 +21,12 @@ public class PinyinIndicesAnalysis extends AbstractComponent {
                                  IndicesAnalysisService indicesAnalysisService, Environment env) {
         super(settings);
 
-        //analyzers
-        indicesAnalysisService.analyzerProviderFactories().put("pinyin_first_letter",
-                new PreBuiltAnalyzerProviderFactory("pinyin_first_letter", AnalyzerScope.GLOBAL,
-                        new PinyinAnalyzer("only", "")));
+        final PinyinConfig config = new PinyinConfig(settings);
 
+        //analyzers
         indicesAnalysisService.analyzerProviderFactories().put("pinyin",
                 new PreBuiltAnalyzerProviderFactory("pinyin", AnalyzerScope.GLOBAL,
-                        new PinyinAnalyzer("none", " ")));
+                        new PinyinAnalyzer(config)));
 
         //tokenizers
         indicesAnalysisService.tokenizerFactories().put("pinyin",
@@ -40,22 +38,10 @@ public class PinyinIndicesAnalysis extends AbstractComponent {
 
                     @Override
                     public Tokenizer create() {
-                        return new PinyinTokenizer("none", " ");
+                        return new PinyinTokenizer(config);
                     }
                 }));
 
-        indicesAnalysisService.tokenizerFactories().put("pinyin_first_letter",
-                new PreBuiltTokenizerFactoryFactory(new TokenizerFactory() {
-                    @Override
-                    public String name() {
-                        return "pinyin_first_letter";
-                    }
-
-                    @Override
-                    public Tokenizer create() {
-                        return new PinyinTokenizer("only", "");
-                    }
-                }));
 
 
         //tokenFilters
@@ -68,22 +54,10 @@ public class PinyinIndicesAnalysis extends AbstractComponent {
 
                     @Override
                     public TokenStream create(TokenStream tokenStream) {
-                        return new PinyinTokenFilter(tokenStream, "none", " ");
+                        return new PinyinTokenFilter(tokenStream, config);
                     }
                 }));
 
-        indicesAnalysisService.tokenFilterFactories().put("pinyin_first_letter",
-                new PreBuiltTokenFilterFactoryFactory(new TokenFilterFactory() {
-                    @Override
-                    public String name() {
-                        return "pinyin_first_letter";
-                    }
-
-                    @Override
-                    public TokenStream create(TokenStream tokenStream) {
-                        return new PinyinTokenFilter(tokenStream, "only", "");
-                    }
-                }));
 
     }
 }
