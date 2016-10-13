@@ -15,6 +15,7 @@ public class PinyinConfig {
     public boolean keepFirstLetter=true;
     public boolean keepSeparateFirstLetter=false;
     public boolean keepNoneChineseTogether=true;
+    public boolean noneChinesePinyinTokenize =true;
     public int     LimitFirstLetterLength=16;
     public boolean keepFullPinyin=true;
     public boolean removeDuplicateTerm=false;
@@ -26,6 +27,7 @@ public class PinyinConfig {
         this.keepFullPinyin=settings.getAsBoolean("keep_full_pinyin", true);
         this.keepNoneChinese=settings.getAsBoolean("keep_none_chinese",true);
         this.keepNoneChineseTogether=settings.getAsBoolean("keep_none_chinese_together",true);
+        this.noneChinesePinyinTokenize =settings.getAsBoolean("none_chinese_pinyin_tokenize",true);
         this.keepOriginal=settings.getAsBoolean("keep_original", true);
         this.LimitFirstLetterLength=settings.getAsInt("limit_first_letter_length", 16);
         this.lowercase=settings.getAsBoolean("lowercase", true);

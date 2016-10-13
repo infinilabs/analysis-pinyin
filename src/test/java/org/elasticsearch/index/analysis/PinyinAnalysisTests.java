@@ -219,6 +219,44 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("zi", pinyin.get(7));
         Assert.assertEquals("mz", pinyin.get(8));
 
+
+        config = new PinyinConfig();
+        config.keepFirstLetter = true;
+        config.keepSeparateFirstLetter = true;
+        config.keepNoneChinese = true;
+        config.keepNoneChineseInFirstLetter = false;
+        config.keepOriginal = false;
+        config.keepFullPinyin = true;
+        config.LimitFirstLetterLength = 5;
+        config.lowercase = true;
+        config.noneChinesePinyinTokenize=true;
+
+        sr = new StringReader("liudehuaalibaba13zhuanghan134");
+        analyzer = new WhitespaceAnalyzer();
+        filter = new PinyinTokenFilter(analyzer.tokenStream("f", sr), config);
+        pinyin = new ArrayList<String>();
+        filter.reset();
+        System.out.println();
+        while (filter.incrementToken()) {
+            CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
+            OffsetAttribute offset = filter.getAttribute(OffsetAttribute.class);
+            pinyin.add(ta.toString());
+            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset());
+        }
+
+        Assert.assertEquals(11, pinyin.size());
+        Assert.assertEquals("liu", pinyin.get(0));
+        Assert.assertEquals("de", pinyin.get(1));
+        Assert.assertEquals("hua", pinyin.get(2));
+        Assert.assertEquals("a", pinyin.get(3));
+        Assert.assertEquals("li", pinyin.get(4));
+        Assert.assertEquals("ba", pinyin.get(5));
+        Assert.assertEquals("ba", pinyin.get(6));
+        Assert.assertEquals("13", pinyin.get(7));
+        Assert.assertEquals("zhuang", pinyin.get(8));
+        Assert.assertEquals("han", pinyin.get(9));
+        Assert.assertEquals("134", pinyin.get(10));
+
     }
 
     @Test
@@ -231,6 +269,7 @@ public class PinyinAnalysisTests {
                 };
 
         PinyinConfig config = new PinyinConfig();
+        config.noneChinesePinyinTokenize=false;
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
         ArrayList<TermItem> re = result.get("刘德华");
@@ -400,6 +439,7 @@ public class PinyinAnalysisTests {
         config.keepNoneChineseTogether = true;
         config.keepOriginal = false;
         config.keepFullPinyin = false;
+        config.noneChinesePinyinTokenize=false;
         result = getStringArrayListHashMap(s, config);
 
         re = result.get("DJ音乐家");
@@ -500,6 +540,38 @@ public class PinyinAnalysisTests {
             String s = result.get(i);
             System.out.println(s);
         }
+        Assert.assertEquals("mao", result.get(0));
+        Assert.assertEquals("mei", result.get(1));
+        Assert.assertEquals("ru", result.get(2));
+        Assert.assertEquals("hua", result.get(3));
+    }
+
+    @Test
+    public void TestPinyinTokenize(){
+        String str ="liudehuaalibaba13zhuanghan134";
+        List<String> result = PinyinAlphabetTokenizer.walk(str);
+        for (int i = 0; i < result.size(); i++) {
+            System.out.println(result.get(i));
+        }
+        Assert.assertEquals("liu", result.get(0));
+        Assert.assertEquals("de", result.get(1));
+        Assert.assertEquals("hua", result.get(2));
+        Assert.assertEquals("a", result.get(3));
+        Assert.assertEquals("li", result.get(4));
+        Assert.assertEquals("ba", result.get(5));
+        Assert.assertEquals("ba", result.get(6));
+        Assert.assertEquals("13", result.get(7));
+        Assert.assertEquals("zhuang", result.get(8));
+        Assert.assertEquals("han", result.get(9));
+        Assert.assertEquals("134", result.get(10));
+
+        str ="a123";
+        result = PinyinAlphabetTokenizer.walk(str);
+        for (int i = 0; i < result.size(); i++) {
+            System.out.println(result.get(i));
+        }
+        Assert.assertEquals("a", result.get(0));
+        Assert.assertEquals("123", result.get(1));
     }
 
 

@@ -101,7 +101,6 @@ public class PinyinTokenizer extends Tokenizer {
                     if (upto == buffer.length)
                         buffer = termAtt.resizeBuffer(1 + buffer.length);
                 }
-                lastPosition = upto;
                 termAtt.setLength(upto);
                 source = termAtt.toString();
 
@@ -112,6 +111,7 @@ public class PinyinTokenizer extends Tokenizer {
 
                 for (int i = 0; i < source.length(); i++) {
                     char c = source.charAt(i);
+                    lastPosition=i;
                     //keep original alphabet
                     if (c < 128) {
                         if ((c > 96 && c < 123) || (c > 64 && c < 91) || (c > 47 && c < 58)) {
@@ -132,9 +132,7 @@ public class PinyinTokenizer extends Tokenizer {
                     } else {
                         //clean previous temp
                         if (buff.length() > 0) {
-                            addCandidate(new TermItem(buff.toString(), i - buffSize, i));
-                            buff.setLength(0);
-                            buffSize = 0;
+                            buffSize = parseBuff(buff, buffSize);
                         }
 
                         String pinyin = pinyinList.get(i);
@@ -153,9 +151,7 @@ public class PinyinTokenizer extends Tokenizer {
 
                 //clean previous temp
                 if (buff.length() > 0) {
-                    addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));
-                    buff.setLength(0);
-                    buffSize = 0;
+                    buffSize = parseBuff(buff, buffSize);
                 }
             }
 
@@ -194,6 +190,20 @@ public class PinyinTokenizer extends Tokenizer {
             return false;
         }
         return false;
+    }
+
+    private int parseBuff(StringBuilder buff, int buffSize) {
+        if(config.noneChinesePinyinTokenize){
+            List<String> result = PinyinAlphabetTokenizer.walk(buff.toString());
+            for (int i = 0; i < result.size(); i++) {
+                addCandidate(new TermItem(result.get(i), lastPosition - buffSize, lastPosition));
+            }
+        }else{
+            addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));
+        }
+        buff.setLength(0);
+        buffSize = 0;
+        return buffSize;
     }
 
     @Override

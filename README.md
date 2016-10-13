@@ -39,7 +39,8 @@ The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:
 * `keep_none_chinese_in_first_letter` keep non Chinese letters in first letter, eg: `刘德华AT2016`->`ldhat2016`, default: true
 * `keep_full_pinyin` when this option enabled, eg: `刘德华`> [`liu`,`de`,`hua`], default: true
 * `keep_none_chinese` keep non chinese letter or number in result, default: true
-* `keep_none_chinese_together` keep non chinese letter together, default: true, eg: `DJ音乐家` -> `DJ`,`yin`,`yue`,`jia`
+* `keep_none_chinese_together` keep non chinese letter together, default: true, eg: `DJ音乐家` -> `DJ`,`yin`,`yue`,`jia`, when set to `false`, eg: `DJ音乐家` -> `D`,`J`,`yin`,`yue`,`jia`
+* `none_chinese_pinyin_tokenize` break non chinese letters into separate pinyin term if they are pinyin, default: true, eg: `liudehuaalibaba13zhuanghan` -> `liu`,`de`,`hua`,`a`,`li`,`ba`,`ba`,`13`,`zhuang`,`han`
 * `keep_original` when this option enabled, will keep original input as well, default: true
 * `lowercase`  lowercase non Chinese letters, default: true
 * `trim_whitespace` default: true
@@ -60,15 +61,11 @@ curl -XPUT http://localhost:9200/medcl/ -d'
             "tokenizer" : {
                 "my_pinyin" : {
                     "type" : "pinyin",
-                    "keep_first_letter" : true,
                     "keep_separate_first_letter" : false,
                     "keep_full_pinyin" : true,
-                    "keep_none_chinese" : true,
                     "keep_original" : true,
                     "limit_first_letter_length" : 16,
-                    "lowercase" : true,
-                    "trim_whitespace" : true,
-                    "keep_none_chinese_in_first_letter" : true
+                    "lowercase" : true
                 }
             }
         }
