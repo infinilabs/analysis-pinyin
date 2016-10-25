@@ -79,6 +79,8 @@ public class PinyinTokenizer extends Tokenizer {
         }
         termAtt.setEmpty();
         termAtt.append(term);
+        if(startOffset<0){startOffset=0;}
+        if(endOffset<startOffset){endOffset=startOffset+term.length();}
         offsetAtt.setOffset(correctOffset(startOffset), correctOffset(endOffset));
     }
 
