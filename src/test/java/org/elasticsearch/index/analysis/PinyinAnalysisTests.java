@@ -257,6 +257,37 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("han", pinyin.get(9));
         Assert.assertEquals("134", pinyin.get(10));
 
+
+
+        config = new PinyinConfig();
+        config.keepFirstLetter=true;
+        config.keepFullPinyin=false;
+        config.keepJoinedFullPinyin =true;
+        config.keepNoneChinese=false;
+        config.keepNoneChineseTogether=true;
+        config.noneChinesePinyinTokenize=true;
+        config.keepNoneChineseInFirstLetter=true;
+        config.keepOriginal=false;
+        config.lowercase=true;
+        config.trimWhitespace=true;
+
+        sr = new StringReader("刘德华");
+        analyzer = new WhitespaceAnalyzer();
+        filter = new PinyinTokenFilter(analyzer.tokenStream("f", sr), config);
+        pinyin = new ArrayList<String>();
+        filter.reset();
+        System.out.println();
+        while (filter.incrementToken()) {
+            CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
+            OffsetAttribute offset = filter.getAttribute(OffsetAttribute.class);
+            pinyin.add(ta.toString());
+            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset());
+        }
+
+        Assert.assertEquals("liudehua", pinyin.get(0));
+        Assert.assertEquals("ldh", pinyin.get(1));
+
+
     }
 
     @Test
@@ -405,6 +436,47 @@ public class PinyinAnalysisTests {
         result = getStringArrayListHashMap(s1, config);
 
         re = result.get("lu金 s刘德华 张学友 郭富城 黎明 四大lao天王liudehua");
+        Assert.assertEquals("lujsldhzxygfclms", re.get(0).term);
+
+
+        s1 = new String[]{"刘德华"};
+        config = new PinyinConfig();
+        config.keepFirstLetter=true;
+        config.keepFullPinyin=false;
+        config.keepJoinedFullPinyin =true;
+        config.keepNoneChinese=false;
+        config.keepNoneChineseTogether=true;
+        config.noneChinesePinyinTokenize=true;
+        config.keepNoneChineseInFirstLetter=true;
+        config.keepOriginal=false;
+        config.lowercase=true;
+        config.trimWhitespace=true;
+
+        result = getStringArrayListHashMap(s1, config);
+
+        re = result.get("刘德华");
+        Assert.assertEquals("liudehua", re.get(0).term);
+        Assert.assertEquals("ldh", re.get(1).term);
+
+        s1 = new String[]{"刘德华"};
+        config = new PinyinConfig();
+        config.keepFirstLetter=false;
+        config.keepFullPinyin=false;
+        config.keepJoinedFullPinyin =true;
+        config.keepNoneChinese=false;
+        config.keepNoneChineseTogether=true;
+        config.noneChinesePinyinTokenize=true;
+        config.keepNoneChineseInFirstLetter=true;
+        config.keepOriginal=false;
+        config.lowercase=true;
+        config.trimWhitespace=true;
+
+        result = getStringArrayListHashMap(s1, config);
+
+        re = result.get("刘德华");
+        Assert.assertEquals("liudehua", re.get(0).term);
+
+
     }
 
     @Test
