@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.elasticsearch</groupId>
     <artifactId>elasticsearch-analysis-pinyin</artifactId>
-    <version>1.8.1</version>
+    <version>1.8.2</version>
     <packaging>jar</packaging>
     <description>Pinyin Analysis for Elasticsearch</description>
     <inceptionYear>2012</inceptionYear>
@@ -41,7 +41,7 @@
     </parent>
 
     <properties>
-        <elasticsearch.version>2.4.1</elasticsearch.version>
+        <elasticsearch.version>2.4.2</elasticsearch.version>
         <maven.compiler.target>1.7</maven.compiler.target>
         <elasticsearch.assembly.descriptor>${project.basedir}/src/main/assemblies/plugin.xml</elasticsearch.assembly.descriptor>
         <elasticsearch.plugin.name>analysis-pinyin</elasticsearch.plugin.name>
