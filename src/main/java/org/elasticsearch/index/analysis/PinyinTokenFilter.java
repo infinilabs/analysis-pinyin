@@ -32,6 +32,7 @@ public class PinyinTokenFilter extends TokenFilter {
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private boolean done = true;
     private boolean processedCandidate = false;
+    private boolean processedFullPinyinLetter = false;
     private boolean processedFirstLetter = false;
     private boolean processedOriginal = false;
     protected int position = 0;
@@ -39,17 +40,19 @@ public class PinyinTokenFilter extends TokenFilter {
     private PinyinConfig config;
     List<String> candidate;
     StringBuilder firstLetters;
+    StringBuilder fullPinyinLetters;
     String source;
 
     public PinyinTokenFilter(TokenStream in, PinyinConfig config) {
         super(in);
         this.config = config;
         //validate config
-        if (!(config.keepFirstLetter || config.keepFullPinyin)) {
+        if (!(config.keepFirstLetter || config.keepFullPinyin|| config.keepJoinedFullPinyin)) {
             throw new ConfigErrorException("pinyin config error, can't disable first_letter and full_pinyin at the same time.");
         }
         candidate = new ArrayList<>();
         firstLetters = new StringBuilder();
+        fullPinyinLetters = new StringBuilder();
     }
 
     @Override
@@ -118,6 +121,9 @@ public class PinyinTokenFilter extends TokenFilter {
                         if (config.keepFullPinyin) {
                             candidate.add(pinyin);
                         }
+                        if(config.keepJoinedFullPinyin){
+                            fullPinyinLetters.append(pinyin);
+                        }
                     }
                 }
             }
@@ -149,6 +155,15 @@ public class PinyinTokenFilter extends TokenFilter {
             return true;
         }
 
+
+        if (config.keepJoinedFullPinyin && !processedFullPinyinLetter) {
+            processedFullPinyinLetter = true;
+            termAtt.setEmpty();
+            termAtt.append(fullPinyinLetters.toString());
+            termAtt.setLength(fullPinyinLetters.length());
+            fullPinyinLetters.setLength(0);
+            return true;
+        }
 
         if (config.keepFirstLetter && firstLetters.length() > 0 && !processedFirstLetter) {
             processedFirstLetter = true;
@@ -202,8 +217,10 @@ public class PinyinTokenFilter extends TokenFilter {
         candidate.clear();
         this.processedCandidate = false;
         this.processedFirstLetter = false;
+        this.processedFullPinyinLetter = false;
         this.processedOriginal = false;
         firstLetters.setLength(0);
+        fullPinyinLetters.setLength(0);
         source = null;
         candidate.clear();
     }

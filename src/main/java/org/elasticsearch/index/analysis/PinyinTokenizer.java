@@ -20,6 +20,7 @@ public class PinyinTokenizer extends Tokenizer {
     private boolean done = false;
     private boolean processedCandidate = false;
     private boolean processedFirstLetter = false;
+    private boolean processedFullPinyinLetter = false;
     private boolean processedOriginal = false;
     protected int position = 0;
     protected int lastPosition = 0;
@@ -28,6 +29,8 @@ public class PinyinTokenizer extends Tokenizer {
     ArrayList<TermItem> candidate;
     private HashSet<String> termsFilter;
     StringBuilder firstLetters;
+    StringBuilder fullPinyinLetters;
+
     String source;
 
     public PinyinTokenizer(PinyinConfig config) {
@@ -35,12 +38,13 @@ public class PinyinTokenizer extends Tokenizer {
         this.config = config;
 
         //validate config
-        if (!(config.keepFirstLetter || config.keepFullPinyin)) {
+        if (!(config.keepFirstLetter || config.keepFullPinyin || config.keepJoinedFullPinyin)) {
             throw new ConfigErrorException("pinyin config error, can't disable first_letter and full_pinyin at the same time.");
         }
         candidate = new ArrayList<>();
         termsFilter = new HashSet<>();
         firstLetters = new StringBuilder();
+        fullPinyinLetters = new StringBuilder();
     }
 
     public PinyinTokenizer(int bufferSize) {
@@ -148,6 +152,9 @@ public class PinyinTokenizer extends Tokenizer {
                             if (config.keepFullPinyin) {
                                 addCandidate(new TermItem(pinyin, i, i + 1));
                             }
+                            if(config.keepJoinedFullPinyin){
+                                fullPinyinLetters.append(pinyin);
+                            }
                         }
                     }
                 }
@@ -161,6 +168,12 @@ public class PinyinTokenizer extends Tokenizer {
             if (config.keepOriginal && !processedOriginal) {
                 processedOriginal = true;
                 addCandidate(new TermItem(source, 0, source.length()));
+            }
+
+            if (config.keepJoinedFullPinyin && !processedFullPinyinLetter) {
+                processedFullPinyinLetter = true;
+                addCandidate(new TermItem(fullPinyinLetters.toString(), 0, fullPinyinLetters.length()));
+                fullPinyinLetters.setLength(0);
             }
 
 
@@ -222,8 +235,10 @@ public class PinyinTokenizer extends Tokenizer {
         this.done = false;
         this.processedCandidate = false;
         this.processedFirstLetter = false;
+        this.processedFullPinyinLetter = false;
         this.processedOriginal = false;
         firstLetters.setLength(0);
+        fullPinyinLetters.setLength(0);
         termsFilter.clear();
         candidate.clear();
         source = null;
