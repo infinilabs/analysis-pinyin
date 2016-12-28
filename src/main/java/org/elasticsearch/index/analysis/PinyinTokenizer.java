@@ -1,134 +1,249 @@
 package org.elasticsearch.index.analysis;
 
-import net.sourceforge.pinyin4j.PinyinHelper;
-import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
-import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
-import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
-import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
-import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.elasticsearch.analysis.PinyinConfig;
+import org.nlpcn.commons.lang.pinyin.Pinyin;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Medcl'
- * Date: 12-5-21
- * Time: 下午5:53
- */
+
 public class PinyinTokenizer extends Tokenizer {
 
+
     private static final int DEFAULT_BUFFER_SIZE = 256;
-
-    private boolean done = false;
-    private int finalOffset;
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
+    private boolean done = false;
+    private boolean processedCandidate = false;
+    private boolean processedFirstLetter = false;
+    private boolean processedFullPinyinLetter = false;
+    private boolean processedOriginal = false;
+    protected int position = 0;
+    protected int lastPosition = 0;
     private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
-    private HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-    private String padding_char;
-    private String first_letter;
+    private PinyinConfig config;
+    ArrayList<TermItem> candidate;
+    private HashSet<String> termsFilter;
+    StringBuilder firstLetters;
+    StringBuilder fullPinyinLetters;
 
-    public PinyinTokenizer(Reader reader, String padding_char, String first_letter) {
+    String source;
+
+    public PinyinTokenizer(Reader reader, PinyinConfig config) {
         this(reader, DEFAULT_BUFFER_SIZE);
-        this.padding_char = padding_char;
-        this.first_letter = first_letter;
+        this.config = config;
+
+        //validate config
+        if (!(config.keepFirstLetter || config.keepFullPinyin || config.keepJoinedFullPinyin)) {
+            throw new ConfigErrorException("pinyin config error, can't disable first_letter and full_pinyin at the same time.");
+        }
+        candidate = new ArrayList<TermItem>();
+        termsFilter = new HashSet<String>();
+        firstLetters = new StringBuilder();
+        fullPinyinLetters = new StringBuilder();
     }
 
     public PinyinTokenizer(Reader input, int bufferSize) {
         super(input);
         termAtt.resizeBuffer(bufferSize);
-        format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        format.setVCharType(HanyuPinyinVCharType.WITH_V);
+    }
+
+    void addCandidate(TermItem item) {
+
+        String term = item.term;
+        if (config.lowercase) {
+            term = term.toLowerCase();
+        }
+
+        if (config.trimWhitespace) {
+            term = term.trim();
+        }
+        item.term = term;
+
+        if (config.removeDuplicateTerm) {
+            if (termsFilter.contains(term)) {
+                return;
+            }
+            termsFilter.add(term);
+        }
+        candidate.add(item);
+    }
+
+    void setTerm(String term, int startOffset, int endOffset) {
+        if (config.lowercase) {
+            term = term.toLowerCase();
+        }
+
+        if (config.trimWhitespace) {
+            term = term.trim();
+        }
+        termAtt.setEmpty();
+        termAtt.append(term);
+        if(startOffset<0){startOffset=0;}
+        if(endOffset<startOffset){endOffset=startOffset+term.length();}
+        offsetAtt.setOffset(correctOffset(startOffset), correctOffset(endOffset));
     }
 
     @Override
     public final boolean incrementToken() throws IOException {
+
         clearAttributes();
 
         if (!done) {
-            done = true;
-            int upto = 0;
-            char[] buffer = termAtt.buffer();
-            while (true) {
-                final int length = input.read(buffer, upto, buffer.length - upto);
-                if (length == -1) break;
-                upto += length;
-                if (upto == buffer.length)
-                    buffer = termAtt.resizeBuffer(1 + buffer.length);
-            }
-            termAtt.setLength(upto);
-            String str = termAtt.toString();
-            termAtt.setEmpty();
-            StringBuilder stringBuilder = new StringBuilder();
-            StringBuilder firstLetters = new StringBuilder();
-            for (int i = 0; i < str.length(); i++) {
-                char c = str.charAt(i);
-                if (c < 128) {
-                    stringBuilder.append(c);
-                } else {
-                    try {
-                        String[] strs = PinyinHelper.toHanyuPinyinStringArray(c, format);
-                        if (strs != null) {
-                            //get first result by default
-                            String first_value = strs[0];
-                            //TODO more than one pinyin
-                            stringBuilder.append(first_value);
-                            if (this.padding_char.length() > 0) {
-                                stringBuilder.append(this.padding_char);
+
+            //combine text together to get right pinyin
+            if (!processedCandidate) {
+                processedCandidate = true;
+                int upto = 0;
+                char[] buffer = termAtt.buffer();
+                while (true) {
+                    final int length = input.read(buffer, upto, buffer.length - upto);
+                    if (length == -1) break;
+                    upto += length;
+                    if (upto == buffer.length)
+                        buffer = termAtt.resizeBuffer(1 + buffer.length);
+                }
+                termAtt.setLength(upto);
+                source = termAtt.toString();
+
+                List<String> pinyinList = Pinyin.pinyin(source);
+
+                StringBuilder buff = new StringBuilder();
+                int buffSize = 0;
+
+                for (int i = 0; i < source.length(); i++) {
+                    char c = source.charAt(i);
+                    lastPosition=i;
+                    //keep original alphabet
+                    if (c < 128) {
+                        if ((c > 96 && c < 123) || (c > 64 && c < 91) || (c > 47 && c < 58)) {
+                            if (config.keepNoneChinese) {
+                                if (config.keepNoneChinese) {
+                                    if (config.keepNoneChineseTogether) {
+                                        buff.append(c);
+                                        buffSize++;
+                                    } else {
+                                        addCandidate(new TermItem(String.valueOf(c), i, i + 1));
+                                    }
+                                }
                             }
-                            firstLetters.append(first_value.charAt(0));
-
+                            if (config.keepNoneChineseInFirstLetter) {
+                                firstLetters.append(c);
+                            }
                         }
-                    } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
-                        badHanyuPinyinOutputFormatCombination.printStackTrace();
+                    } else {
+                        //clean previous temp
+                        if (buff.length() > 0) {
+                            buffSize = parseBuff(buff, buffSize);
+                        }
+
+                        String pinyin = pinyinList.get(i);
+                        if (pinyin != null && pinyin.length() > 0) {
+
+                            firstLetters.append(pinyin.charAt(0));
+                            if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
+                                addCandidate(new TermItem(String.valueOf(pinyin.charAt(0)), i, i + 1));
+                            }
+                            if (config.keepFullPinyin) {
+                                addCandidate(new TermItem(pinyin, i, i + 1));
+                            }
+                            if(config.keepJoinedFullPinyin){
+                                fullPinyinLetters.append(pinyin);
+                            }
+                        }
                     }
+                }
+
+                //clean previous temp
+                if (buff.length() > 0) {
+                    buffSize = parseBuff(buff, buffSize);
                 }
             }
 
-            //let's join them
-            if (first_letter.equals("prefix")) {
-                termAtt.append(firstLetters.toString());
-                if (this.padding_char.length() > 0) {
-                    termAtt.append(this.padding_char); //TODO splitter
-                }
-                termAtt.append(stringBuilder.toString());
-            } else if (first_letter.equals("append")) {
-                termAtt.append(stringBuilder.toString());
-                if (this.padding_char.length() > 0) {
-                    if(!stringBuilder.toString().endsWith(this.padding_char))
-                    {
-                        termAtt.append(this.padding_char);
-                    }
-                }
-                termAtt.append(firstLetters.toString());
-            } else if (first_letter.equals("none")) {
-                termAtt.append(stringBuilder.toString());
-            } else if (first_letter.equals("only")) {
-                termAtt.append(firstLetters.toString());
+            if (config.keepOriginal && !processedOriginal) {
+                processedOriginal = true;
+                addCandidate(new TermItem(source, 0, source.length()));
+            }
+
+            if (config.keepJoinedFullPinyin && !processedFullPinyinLetter) {
+                processedFullPinyinLetter = true;
+                addCandidate(new TermItem(fullPinyinLetters.toString(), 0, fullPinyinLetters.length()));
+                fullPinyinLetters.setLength(0);
             }
 
 
-            finalOffset = correctOffset(upto);
-            offsetAtt.setOffset(correctOffset(0), finalOffset);
-            return true;
+            if (config.keepFirstLetter && firstLetters.length() > 0 && !processedFirstLetter) {
+                processedFirstLetter = true;
+                String fl;
+                if (firstLetters.length() > config.LimitFirstLetterLength && config.LimitFirstLetterLength > 0) {
+                    fl = firstLetters.substring(0, config.LimitFirstLetterLength);
+                } else {
+                    fl = firstLetters.toString();
+                }
+                if (config.lowercase) {
+                    fl = fl.toLowerCase();
+                }
+                if (!(config.keepSeparateFirstLetter && fl.length() <= 1)) {
+                    addCandidate(new TermItem(fl, 0, fl.length()));
+                }
+            }
+
+
+            if (position < candidate.size()) {
+                TermItem item = candidate.get(position);
+                position++;
+                setTerm(item.term, item.startOffset, item.endOffset);
+                return true;
+            }
+
+
+            done = true;
+            return false;
         }
         return false;
     }
 
+    private int parseBuff(StringBuilder buff, int buffSize) {
+        if (config.keepNoneChinese) {
+            if(config.noneChinesePinyinTokenize){
+                List<String> result = PinyinAlphabetTokenizer.walk(buff.toString());
+                for (int i = 0; i < result.size(); i++) {
+                    addCandidate(new TermItem(result.get(i), lastPosition - buffSize, lastPosition));
+                }
+            }else{
+                addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));
+            }
+        }
+
+        buff.setLength(0);
+        buffSize = 0;
+        return buffSize;
+    }
+
     @Override
-    public final void end() {
-        // set final offset
-        offsetAtt.setOffset(finalOffset, finalOffset);
+    public final void end() throws IOException {
+        super.end();
     }
 
     @Override
     public void reset() throws IOException {
         super.reset();
+        position = 0;
         this.done = false;
+        this.processedCandidate = false;
+        this.processedFirstLetter = false;
+        this.processedFullPinyinLetter = false;
+        this.processedOriginal = false;
+        firstLetters.setLength(0);
+        fullPinyinLetters.setLength(0);
+        termsFilter.clear();
+        candidate.clear();
+        source = null;
     }
 
 
