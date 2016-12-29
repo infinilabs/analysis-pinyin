@@ -1,7 +1,7 @@
 Pinyin Analysis for ElasticSearch
 ==================================
 
-The Pinyin Analysis plugin integrates Pinyin4j(http://pinyin4j.sourceforge.net/) module into elasticsearch.
+This Pinyin Analysis plugin convert Chinese to Pinyin.
 
     --------------------------------------------------
     | Pinyin4j   Analysis Plugin    | ElasticSearch  |

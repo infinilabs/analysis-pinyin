@@ -19,7 +19,7 @@
             <useProjectArtifact>true</useProjectArtifact>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.apache.lucene:lucene-pinyin</include>
+                <include>nlp-lang:nlp-lang</include>
             </includes>
         </dependencySet>
     </dependencySets>
