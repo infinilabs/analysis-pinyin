@@ -477,6 +477,27 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("liudehua", re.get(0).term);
 
 
+        s1 = new String[]{"ceshi"};
+        config = new PinyinConfig();
+        config.keepFirstLetter=false;
+        config.keepSeparateFirstLetter=false;
+        config.keepFullPinyin=false;
+        config.keepJoinedFullPinyin =true;
+        config.keepNoneChinese=true;
+        config.keepNoneChineseTogether=true;
+        config.keepOriginal=true;
+        config.LimitFirstLetterLength=16;
+        config.noneChinesePinyinTokenize=true;
+        config.lowercase=true;
+
+        result = getStringArrayListHashMap(s1, config);
+
+        re = result.get("ceshi");
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals("ceshi", re.get(2).term);
+
+
     }
 
     @Test
@@ -672,6 +693,15 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("liu", result.get(0));
         Assert.assertEquals("de", result.get(1));
         Assert.assertEquals("hua", result.get(2));
+
+
+        str ="ceshi";
+        result = PinyinAlphabetTokenizer.walk(str);
+        for (int i = 0; i < result.size(); i++) {
+            System.out.println(i+": "+result.get(i));
+        }
+        Assert.assertEquals("ce", result.get(0));
+        Assert.assertEquals("shi", result.get(1));
     }
 
 

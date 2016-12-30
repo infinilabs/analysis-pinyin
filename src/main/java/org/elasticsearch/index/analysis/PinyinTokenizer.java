@@ -64,6 +64,10 @@ public class PinyinTokenizer extends Tokenizer {
         }
         item.term = term;
 
+        if(term.length()==0){
+            return;
+        }
+
         if (config.removeDuplicateTerm) {
             if (termsFilter.contains(term)) {
                 return;
@@ -170,7 +174,7 @@ public class PinyinTokenizer extends Tokenizer {
                 addCandidate(new TermItem(source, 0, source.length()));
             }
 
-            if (config.keepJoinedFullPinyin && !processedFullPinyinLetter) {
+            if (config.keepJoinedFullPinyin && !processedFullPinyinLetter&&fullPinyinLetters.length()>0) {
                 processedFullPinyinLetter = true;
                 addCandidate(new TermItem(fullPinyinLetters.toString(), 0, fullPinyinLetters.length()));
                 fullPinyinLetters.setLength(0);
