@@ -156,7 +156,7 @@ public class PinyinTokenFilter extends TokenFilter {
         }
 
 
-        if (config.keepJoinedFullPinyin && !processedFullPinyinLetter) {
+        if (config.keepJoinedFullPinyin && !processedFullPinyinLetter&&fullPinyinLetters.length()>0) {
             processedFullPinyinLetter = true;
             termAtt.setEmpty();
             termAtt.append(fullPinyinLetters.toString());
