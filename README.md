@@ -231,36 +231,91 @@ curl -XGET http://localhost:9200/medcl1/_analyze?text=%e5%88%98%e5%be%b7%e5%8d%8
 
 
 7.Used in phrase query
-<pre>
-PUT /medcl/
-{
-    "index" : {
-        "analysis" : {
-            "analyzer" : {
-                "pinyin_analyzer" : {
-                    "tokenizer" : "my_pinyin"
+- option 1
+    <pre>
+    PUT /medcl/
+    {
+        "index" : {
+            "analysis" : {
+                "analyzer" : {
+                    "pinyin_analyzer" : {
+                        "tokenizer" : "my_pinyin"
+                        }
+                },
+                "tokenizer" : {
+                    "my_pinyin" : {
+                        "type" : "pinyin",
+                        "keep_first_letter":false,
+                        "keep_separate_first_letter" : false,
+                        "keep_full_pinyin" : true,
+                        "keep_original" : false,
+                        "limit_first_letter_length" : 16,
+                        "lowercase" : true
                     }
-            },
-            "tokenizer" : {
-                "my_pinyin" : {
-                    "type" : "pinyin",
-                    "keep_first_letter":false,
-                    "keep_separate_first_letter" : false,
-                    "keep_full_pinyin" : true,
-                    "keep_original" : false,
-                    "limit_first_letter_length" : 16,
-                    "lowercase" : true
                 }
             }
         }
     }
-}
-GET /medcl/folks/_search
-{
-  "query": {"match_phrase": {
-    "name.pinyin": "刘德华"
-  }}
-}
-</pre>
+    GET /medcl/folks/_search
+    {
+      "query": {"match_phrase": {
+        "name.pinyin": "刘德华"
+      }}
+    }
+
+    </pre>
+
+- option 2
+    <pre>
+
+    PUT /medcl/
+    {
+        "index" : {
+            "analysis" : {
+                "analyzer" : {
+                    "pinyin_analyzer" : {
+                        "tokenizer" : "my_pinyin"
+                        }
+                },
+                "tokenizer" : {
+                    "my_pinyin" : {
+                        "type" : "pinyin",
+                        "keep_first_letter":false,
+                        "keep_separate_first_letter" : true,
+                        "keep_full_pinyin" : false,
+                        "keep_original" : false,
+                        "limit_first_letter_length" : 16,
+                        "lowercase" : true
+                    }
+                }
+            }
+        }
+    }
+
+    POST /medcl/folks/andy
+    {"name":"刘德华"}
+
+    GET /medcl/folks/_search
+    {
+      "query": {"match_phrase": {
+        "name.pinyin": "刘德h"
+      }}
+    }
+
+    GET /medcl/folks/_search
+    {
+      "query": {"match_phrase": {
+        "name.pinyin": "刘dh"
+      }}
+    }
+
+    GET /medcl/folks/_search
+    {
+      "query": {"match_phrase": {
+        "name.pinyin": "dh"
+      }}
+    }
+
+    </pre>
 
 8.That's all, have fun.

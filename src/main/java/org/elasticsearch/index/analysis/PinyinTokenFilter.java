@@ -47,7 +47,7 @@ public class PinyinTokenFilter extends TokenFilter {
         super(in);
         this.config = config;
         //validate config
-        if (!(config.keepFirstLetter || config.keepFullPinyin|| config.keepJoinedFullPinyin)) {
+        if (!(config.keepFirstLetter||config.keepSeparateFirstLetter || config.keepFullPinyin|| config.keepJoinedFullPinyin)) {
             throw new ConfigErrorException("pinyin config error, can't disable first_letter and full_pinyin at the same time.");
         }
         candidate = new ArrayList<>();

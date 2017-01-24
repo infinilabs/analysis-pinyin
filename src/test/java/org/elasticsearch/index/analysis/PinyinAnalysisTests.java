@@ -498,7 +498,161 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("ceshi", re.get(2).term);
 
 
+
+
     }
+
+    @Test
+    public void TestFirstLetters() throws IOException {
+        String[] s1 = new String[]{"刘德华"};
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = false;
+        config.keepSeparateFirstLetter = true;
+        config.keepFullPinyin = false;
+        config.keepJoinedFullPinyin = false;
+        config.keepNoneChinese = true;
+        config.keepNoneChineseTogether = true;
+        config.keepOriginal = false;
+        config.LimitFirstLetterLength = 16;
+        config.noneChinesePinyinTokenize = true;
+        config.lowercase = true;
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s1, config);
+
+        ArrayList<TermItem> re = result.get("刘德华");
+        Assert.assertEquals("l", re.get(0).term);
+        Assert.assertEquals("d", re.get(1).term);
+        Assert.assertEquals("h", re.get(2).term);
+
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(2).startOffset);
+
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+        Assert.assertEquals(3, re.get(2).endOffset);
+    }
+        @Test
+    public void TestOnlyLetters() throws IOException {
+        String[] s1 = new String[]{"ldh"};
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter=false;
+        config.keepSeparateFirstLetter=false;
+        config.keepFullPinyin=true;
+        config.keepJoinedFullPinyin =false;
+        config.keepNoneChinese=true;
+        config.keepNoneChineseTogether=true;
+        config.keepOriginal=false;
+        config.LimitFirstLetterLength=16;
+        config.noneChinesePinyinTokenize=true;
+        config.lowercase=true;
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s1, config);
+
+        ArrayList<TermItem> re = result.get("ldh");
+        Assert.assertEquals("l", re.get(0).term);
+        Assert.assertEquals("d", re.get(1).term);
+        Assert.assertEquals("h", re.get(2).term);
+
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(2).startOffset);
+
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+        Assert.assertEquals(3, re.get(2).endOffset);
+
+
+        s1 = new String[]{"liuldhdehua"};
+         config = new PinyinConfig();
+        config.keepFirstLetter=false;
+        config.keepSeparateFirstLetter=false;
+        config.keepFullPinyin=true;
+        config.keepJoinedFullPinyin =false;
+        config.keepNoneChinese=true;
+        config.keepNoneChineseTogether=true;
+        config.keepOriginal=false;
+        config.LimitFirstLetterLength=16;
+        config.noneChinesePinyinTokenize=true;
+        config.lowercase=true;
+
+        result = getStringArrayListHashMap(s1, config);
+
+        re = result.get("liuldhdehua");
+        Assert.assertEquals("liu", re.get(0).term);
+        Assert.assertEquals("l", re.get(1).term);
+        Assert.assertEquals("d", re.get(2).term);
+        Assert.assertEquals("h", re.get(3).term);
+        Assert.assertEquals("de", re.get(4).term);
+        Assert.assertEquals("hua", re.get(5).term);
+
+       s1 = new String[]{"liuldh"};
+         config = new PinyinConfig();
+        config.keepFirstLetter=false;
+        config.keepSeparateFirstLetter=false;
+        config.keepFullPinyin=true;
+        config.keepJoinedFullPinyin =false;
+        config.keepNoneChinese=true;
+        config.keepNoneChineseTogether=true;
+        config.keepOriginal=false;
+        config.LimitFirstLetterLength=16;
+        config.noneChinesePinyinTokenize=true;
+        config.lowercase=true;
+
+        result = getStringArrayListHashMap(s1, config);
+
+        re = result.get("liuldh");
+        Assert.assertEquals("liu", re.get(0).term);
+        Assert.assertEquals("l", re.get(1).term);
+        Assert.assertEquals("d", re.get(2).term);
+        Assert.assertEquals("h", re.get(3).term);
+
+        s1 = new String[]{"ldhdehua"};
+         config = new PinyinConfig();
+        config.keepFirstLetter=false;
+        config.keepSeparateFirstLetter=false;
+        config.keepFullPinyin=true;
+        config.keepJoinedFullPinyin =false;
+        config.keepNoneChinese=true;
+        config.keepNoneChineseTogether=true;
+        config.keepOriginal=false;
+        config.LimitFirstLetterLength=16;
+        config.noneChinesePinyinTokenize=true;
+        config.lowercase=true;
+
+        result = getStringArrayListHashMap(s1, config);
+
+        re = result.get("ldhdehua");
+        Assert.assertEquals("l", re.get(0).term);
+        Assert.assertEquals("d", re.get(1).term);
+        Assert.assertEquals("h", re.get(2).term);
+        Assert.assertEquals("de", re.get(3).term);
+        Assert.assertEquals("hua", re.get(4).term);
+
+        s1 = new String[]{"ldh123dehua"};
+         config = new PinyinConfig();
+        config.keepFirstLetter=false;
+        config.keepSeparateFirstLetter=false;
+        config.keepFullPinyin=true;
+        config.keepJoinedFullPinyin =false;
+        config.keepNoneChinese=true;
+        config.keepNoneChineseTogether=true;
+        config.keepOriginal=false;
+        config.LimitFirstLetterLength=16;
+        config.noneChinesePinyinTokenize=true;
+        config.lowercase=true;
+
+        result = getStringArrayListHashMap(s1, config);
+
+        re = result.get("ldh123dehua");
+        Assert.assertEquals("l", re.get(0).term);
+        Assert.assertEquals("d", re.get(1).term);
+        Assert.assertEquals("h", re.get(2).term);
+        Assert.assertEquals("123", re.get(3).term);
+        Assert.assertEquals("de", re.get(4).term);
+        Assert.assertEquals("hua", re.get(5).term);
+    }
+
 
     @Test
     public void TestOnlyFirstLetterTokenizer() throws IOException {

@@ -24,6 +24,7 @@ public class PinyinTokenizer extends Tokenizer {
     private boolean processedOriginal = false;
     protected int position = 0;
     protected int lastPosition = 0;
+    protected int lastBufferPosition = 0;
     private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private PinyinConfig config;
     ArrayList<TermItem> candidate;
@@ -38,7 +39,7 @@ public class PinyinTokenizer extends Tokenizer {
         this.config = config;
 
         //validate config
-        if (!(config.keepFirstLetter || config.keepFullPinyin || config.keepJoinedFullPinyin)) {
+        if (!(config.keepFirstLetter||config.keepSeparateFirstLetter || config.keepFullPinyin || config.keepJoinedFullPinyin)) {
             throw new ConfigErrorException("pinyin config error, can't disable first_letter and full_pinyin at the same time.");
         }
         candidate = new ArrayList<>();
@@ -142,6 +143,7 @@ public class PinyinTokenizer extends Tokenizer {
                     } else {
                         //clean previous temp
                         if (buff.length() > 0) {
+                            lastBufferPosition=i;
                             buffSize = parseBuff(buff, buffSize);
                         }
 
@@ -164,6 +166,7 @@ public class PinyinTokenizer extends Tokenizer {
 
                 //clean previous temp
                 if (buff.length() > 0) {
+                    lastBufferPosition=lastPosition;
                     buffSize = parseBuff(buff, buffSize);
                 }
             }
@@ -215,8 +218,10 @@ public class PinyinTokenizer extends Tokenizer {
         if (config.keepNoneChinese) {
             if(config.noneChinesePinyinTokenize){
                 List<String> result = PinyinAlphabetTokenizer.walk(buff.toString());
+                int start=(lastPosition+1)-buffSize;
                 for (int i = 0; i < result.size(); i++) {
-                    addCandidate(new TermItem(result.get(i), lastPosition - buffSize, lastPosition));
+                    int end=start+i+1;
+                    addCandidate(new TermItem(result.get(i),start+i , end));
                 }
             }else{
                 addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));

@@ -29,7 +29,7 @@ public class PinyinAlphabetTokenizer {
                 }else{
                     //meet non letter
                     if(lastWord){
-                        parse(candidates, buffer);
+                        parse(candidates, buffer,true);
                         if(buffer.length()>0){
                             String str = buffer.toString();
                             buffer.setLength(0);
@@ -42,13 +42,13 @@ public class PinyinAlphabetTokenizer {
 
                 //start to check pinyin
                 if(buffer.length()>=maxLength){
-                    parse(candidates, buffer);
+                    parse(candidates, buffer,false);
                 }
             }
 
             //cleanup
             if(lastWord){
-                parse(candidates,buffer);
+                parse(candidates,buffer,true);
             }
 
             //final cleanup
@@ -59,7 +59,7 @@ public class PinyinAlphabetTokenizer {
             return candidates;
         }
 
-    private static void parse(LinkedList<String> candidates, StringBuffer buffer) {
+    private static void parse(LinkedList<String> candidates, StringBuffer buffer,Boolean last) {
         for (int j = 0; j < buffer.length(); j++) {
             String guess=buffer.substring(0,buffer.length()-j);
             if(PinyinAlphabetDict.getInstance().match(guess)){
@@ -67,7 +67,13 @@ public class PinyinAlphabetTokenizer {
                 String left=buffer.substring(buffer.length()-j,buffer.length());
                 buffer.setLength(0);
                 buffer.append(left);
-                break;
+                if(!last){
+                    break;
+                }else{
+                    if(left.length()>0){
+                        parse(candidates,buffer,last);
+                    }
+                }
             }
         }
     }
