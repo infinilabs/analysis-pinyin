@@ -270,6 +270,7 @@ public class PinyinAnalysisTests {
         config.keepOriginal=false;
         config.lowercase=true;
         config.trimWhitespace=true;
+        config.fixedPinyinOffset =true;
 
         sr = new StringReader("刘德华");
         analyzer = new WhitespaceAnalyzer();
@@ -760,6 +761,229 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("ldh", re.get(7).term);
         Assert.assertEquals(0, re.get(7).startOffset);
         Assert.assertEquals(3, re.get(7).endOffset);
+
+    }
+
+    @Test
+    public void TestPinyinTokenizerOffsetWithExtraTerms() throws IOException {
+        String[] s =
+                {
+                        "ceshi",
+                        "测shi",
+                        "ce试",
+                        "测试",
+                        "1测shi",
+                };
+
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = true;
+        config.keepSeparateFirstLetter = false;
+        config.keepNoneChinese = true;
+        config.keepOriginal = true;
+        config.keepFullPinyin = true;
+        config.keepNoneChineseTogether = true;
+        config.removeDuplicateTerm = true;
+        config.fixedPinyinOffset=false;
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re;
+
+        re = result.get("ceshi");
+        Assert.assertEquals(3, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(2, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(2, re.get(1).startOffset);
+        Assert.assertEquals(5, re.get(1).endOffset);
+
+        re = result.get("测shi");
+        Assert.assertEquals(4, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(4, re.get(1).endOffset);
+
+        re = result.get("ce试");
+        Assert.assertEquals(4, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(2, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(2, re.get(1).startOffset);
+        Assert.assertEquals(3, re.get(1).endOffset);
+
+        re = result.get("测试");
+        Assert.assertEquals(4, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+
+        re = result.get("1测shi");
+        Assert.assertEquals(5, re.size());
+        Assert.assertEquals("1", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("ce", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+        Assert.assertEquals("shi", re.get(2).term);
+        Assert.assertEquals(2, re.get(2).startOffset);
+        Assert.assertEquals(5, re.get(2).endOffset);
+
+    }
+
+    @Test
+    public void TestPinyinTokenizerOffset() throws IOException {
+        String[] s =
+                {
+                        "ceshi",
+                        "测shi",
+                        "ce试",
+                        "测试",
+                        "1测shi",
+                };
+
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = false;
+        config.keepSeparateFirstLetter = false;
+        config.keepNoneChinese = true;
+        config.keepOriginal = false;
+        config.keepFullPinyin = true;
+        config.keepNoneChineseTogether = true;
+        config.fixedPinyinOffset=false;
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re;
+
+        re = result.get("ceshi");
+        Assert.assertEquals(2, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(2, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(2, re.get(1).startOffset);
+        Assert.assertEquals(5, re.get(1).endOffset);
+
+        re = result.get("测shi");
+        Assert.assertEquals(2, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(4, re.get(1).endOffset);
+
+        re = result.get("ce试");
+        Assert.assertEquals(2, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(2, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(2, re.get(1).startOffset);
+        Assert.assertEquals(3, re.get(1).endOffset);
+
+        re = result.get("测试");
+        Assert.assertEquals(2, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+
+        re = result.get("1测shi");
+        Assert.assertEquals(3, re.size());
+        Assert.assertEquals("1", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("ce", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+        Assert.assertEquals("shi", re.get(2).term);
+        Assert.assertEquals(2, re.get(2).startOffset);
+        Assert.assertEquals(5, re.get(2).endOffset);
+
+    }
+
+    @Test
+    public void TestPinyinTokenizerFixedOffset() throws IOException {
+        String[] s =
+                {
+                        "ceshi",
+                        "测shi",
+//                        "ce试",
+                        "测试",
+                        "1测shi",
+                };
+
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = false;
+        config.keepSeparateFirstLetter = false;
+        config.keepNoneChinese = true;
+        config.keepOriginal = false;
+        config.keepFullPinyin = true;
+        config.keepNoneChineseTogether = true;
+        config.fixedPinyinOffset=true;
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re;
+
+        re = result.get("ceshi");
+        Assert.assertEquals(2, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+
+        re = result.get("测shi");
+        Assert.assertEquals(2, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+
+//        re = result.get("ce试");
+//        Assert.assertEquals(2, re.size());
+//        Assert.assertEquals("ce", re.get(0).term);
+//        Assert.assertEquals(0, re.get(0).startOffset);
+//        Assert.assertEquals(1, re.get(0).endOffset);
+//        Assert.assertEquals("shi", re.get(1).term);
+//        Assert.assertEquals(1, re.get(1).startOffset);
+//        Assert.assertEquals(2, re.get(1).endOffset);
+
+        re = result.get("测试");
+        Assert.assertEquals(2, re.size());
+        Assert.assertEquals("ce", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("shi", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+
+        re = result.get("1测shi");
+        Assert.assertEquals(3, re.size());
+        Assert.assertEquals("1", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals("ce", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+        Assert.assertEquals("shi", re.get(2).term);
+        Assert.assertEquals(2, re.get(2).startOffset);
+        Assert.assertEquals(3, re.get(2).endOffset);
 
     }
 

@@ -122,7 +122,6 @@ public class PinyinTokenizer extends Tokenizer {
 
                 for (int i = 0; i < source.length(); i++) {
                     char c = source.charAt(i);
-                    lastPosition=i;
                     //keep original alphabet
                     if (c < 128) {
                         if ((c > 96 && c < 123) || (c > 64 && c < 91) || (c > 47 && c < 58)) {
@@ -151,17 +150,20 @@ public class PinyinTokenizer extends Tokenizer {
                         if (pinyin != null && pinyin.length() > 0) {
 
                             firstLetters.append(pinyin.charAt(0));
-                            if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
-                                addCandidate(new TermItem(String.valueOf(pinyin.charAt(0)), i, i + 1));
-                            }
-                            if (config.keepFullPinyin) {
-                                addCandidate(new TermItem(pinyin, i, i + 1));
-                            }
-                            if(config.keepJoinedFullPinyin){
-                                fullPinyinLetters.append(pinyin);
-                            }
+                        if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
+                            addCandidate(new TermItem(String.valueOf(pinyin.charAt(0)), i, i + 1));
+                        }
+                        if (config.keepFullPinyin) {
+                            addCandidate(new TermItem(pinyin, i, i + 1));
+                        }
+                        if(config.keepJoinedFullPinyin){
+                            fullPinyinLetters.append(pinyin);
                         }
                     }
+                    }
+
+                    lastPosition=i;
+
                 }
 
                 //clean previous temp
@@ -218,10 +220,17 @@ public class PinyinTokenizer extends Tokenizer {
         if (config.keepNoneChinese) {
             if(config.noneChinesePinyinTokenize){
                 List<String> result = PinyinAlphabetTokenizer.walk(buff.toString());
-                int start=(lastPosition+1)-buffSize;
+                int start=(lastPosition-buffSize+1);
                 for (int i = 0; i < result.size(); i++) {
-                    int end=start+i+1;
-                    addCandidate(new TermItem(result.get(i),start+i , end));
+                    int end;
+                    String t=result.get(i);
+                    if(config.fixedPinyinOffset){
+                        end=start+1;
+                    }else{
+                        end=start+t.length();
+                    }
+                    addCandidate(new TermItem(result.get(i),start , end));
+                    start=end;
                 }
             }else{
                 addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));
