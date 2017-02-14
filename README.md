@@ -130,7 +130,7 @@ curl -XPOST http://localhost:9200/medcl/folks/_mapping -d'
                     "pinyin": {
                         "type": "text",
                         "store": "no",
-                        "term_vector": "with_positions_offsets",
+                        "term_vector": "with_offsets",
                         "analyzer": "pinyin_analyzer",
                         "boost": 10
                     }
