@@ -30,7 +30,7 @@ This Pinyin Analysis plugin is used to do conversion between Chinese characters 
 The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:  `pinyin`.
 
 ** Optional Parameters ** 
-* `remove_duplicated_term` when this option enabled, duplicated term will be removed to save index, eg: `de的`>`de`, default: false,  NOTE: position related query maybe influenced
+* `remove_duplicated_term` when this option enabled, duplicated term will be removed to save index, eg: `de的`>`de`, default: true,  NOTE: position related query maybe influenced
 * `keep_first_letter` when this option enabled,  eg: `刘德华`>`ldh`, default: true
 * `keep_separate_first_letter` when this option enabled, will keep first letters separately,  eg: `刘德华`>`l`,`d`,`h`, default: false, NOTE: query result maybe too fuzziness due to term too frequency
 * `limit_first_letter_length` set max length of the first_letter result, default: 16
@@ -64,7 +64,8 @@ curl -XPUT http://localhost:9200/medcl/ -d'
                     "keep_full_pinyin" : true,
                     "keep_original" : true,
                     "limit_first_letter_length" : 16,
-                    "lowercase" : true
+                    "lowercase" : true,
+                    "remove_duplicated_term" : true
                 }
             }
         }
