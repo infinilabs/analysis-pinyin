@@ -20,7 +20,7 @@ public class PinyinConfig {
     public boolean keepFullPinyin=true;
     public boolean keepJoinedFullPinyin =false;
     public boolean removeDuplicateTerm=true;
-    public boolean fixedPinyinOffset =true;
+    public boolean fixedPinyinOffset =false;
 
     public PinyinConfig() {}
     public PinyinConfig(Settings settings) {
@@ -37,6 +37,6 @@ public class PinyinConfig {
         this.trimWhitespace=settings.getAsBoolean("trim_whitespace", true);
         this.keepNoneChineseInFirstLetter =settings.getAsBoolean("keep_none_chinese_in_first_letter", true);
         this.removeDuplicateTerm =settings.getAsBoolean("remove_duplicated_term", true);
-        this.fixedPinyinOffset =settings.getAsBoolean("fixed_pinyin_offset", true);
+        this.fixedPinyinOffset =settings.getAsBoolean("fixed_pinyin_offset", false);
     }
 }
