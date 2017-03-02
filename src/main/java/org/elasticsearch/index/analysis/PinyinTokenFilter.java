@@ -104,6 +104,9 @@ public class PinyinTokenFilter extends TokenFilter {
                         if (config.keepNoneChineseInFirstLetter) {
                             firstLetters.append(c);
                         }
+                        if (config.keepNoneChineseInJoinedFullPinyin) {
+                            fullPinyinLetters.append(c);
+                        }
                     }
                 } else {
                     //clean previous temp
@@ -197,7 +200,8 @@ public class PinyinTokenFilter extends TokenFilter {
                     String tmp = temp.get(j);
                     candidate.add(tmp);
                 }
-            } else {
+            } else if(config.keepFirstLetter||config.keepSeparateFirstLetter || config.keepFullPinyin|| !config.keepNoneChineseInJoinedFullPinyin)
+                {
                 candidate.add(buff.toString());
             }
         }

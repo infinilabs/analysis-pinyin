@@ -713,8 +713,31 @@ public class PinyinAnalysisTests {
         Assert.assertEquals(2, re.size());
         Assert.assertEquals("dj", re.get(0).term);
         Assert.assertEquals("djyyj", re.get(1).term);
+
     }
 
+
+    @Test
+    public void TestFullJoinedPinyin() throws IOException{
+        String[] s =
+                {"DJ音乐家"
+                };
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = false;
+        config.keepNoneChineseInFirstLetter = false;
+        config.keepOriginal = false;
+        config.keepFullPinyin = false;
+        config.noneChinesePinyinTokenize=false;
+        config.keepNoneChinese=true;
+        config.keepJoinedFullPinyin=true;
+        config.keepNoneChineseTogether = true;
+        config.keepNoneChineseInJoinedFullPinyin=true;
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re = result.get("DJ音乐家");
+        Assert.assertEquals(1, re.size());
+        Assert.assertEquals("djyinyuejia", re.get(0).term);
+    }
 
     @Test
     public void TestMixedPinyinTokenizer() throws IOException {

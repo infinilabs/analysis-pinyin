@@ -138,6 +138,9 @@ public class PinyinTokenizer extends Tokenizer {
                             if (config.keepNoneChineseInFirstLetter) {
                                 firstLetters.append(c);
                             }
+                            if (config.keepNoneChineseInJoinedFullPinyin) {
+                                fullPinyinLetters.append(c);
+                            }
                         }
                     } else {
                         //clean previous temp
@@ -232,10 +235,10 @@ public class PinyinTokenizer extends Tokenizer {
                     addCandidate(new TermItem(result.get(i),start , end));
                     start=end;
                 }
-            }else{
-                addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));
+            }else if(config.keepFirstLetter||config.keepSeparateFirstLetter || config.keepFullPinyin|| !config.keepNoneChineseInJoinedFullPinyin){
+                    addCandidate(new TermItem(buff.toString(), lastPosition - buffSize, lastPosition));
+                }
             }
-        }
 
         buff.setLength(0);
         buffSize = 0;
