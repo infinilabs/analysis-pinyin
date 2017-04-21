@@ -86,6 +86,7 @@ public class PinyinTokenFilter extends TokenFilter {
             }
 
             List<String> pinyinList = Pinyin.pinyin(source);
+            if (pinyinList.size() == 0) return false;
 
             StringBuilder buff = new StringBuilder();
 
