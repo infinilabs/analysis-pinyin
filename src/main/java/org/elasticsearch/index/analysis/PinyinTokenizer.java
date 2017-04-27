@@ -137,6 +137,7 @@ public class PinyinTokenizer extends Tokenizer {
                 source = termAtt.toString();
 
                 List<String> pinyinList = Pinyin.pinyin(source);
+                if (pinyinList.size() == 0) return false;
 
                 StringBuilder buff = new StringBuilder();
                 int buffStartPosition = 0;

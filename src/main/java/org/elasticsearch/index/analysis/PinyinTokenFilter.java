@@ -91,15 +91,14 @@ public class PinyinTokenFilter extends TokenFilter {
     private boolean readTerm() {
         if (!processedCandidate) {
             processedCandidate = true;
-            final int bufferLength = termAtt.length();
-            source = termAtt.toString();
-            lastPosition = bufferLength;
+            lastPosition = termAtt.length();
             source = termAtt.toString();
             if (config.trimWhitespace) {
                 source = source.trim();
             }
 
             List<String> pinyinList = Pinyin.pinyin(source);
+            if (pinyinList.size() == 0) return false;
 
             StringBuilder buff = new StringBuilder();
             int buffStartPosition = 0;
