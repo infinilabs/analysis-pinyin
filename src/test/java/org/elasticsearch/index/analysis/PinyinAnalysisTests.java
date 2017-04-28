@@ -204,11 +204,14 @@ public class PinyinAnalysisTests {
         pinyin = new ArrayList<String>();
         filter.reset();
         System.out.println();
+        int pos=0;
         while (filter.incrementToken()) {
             CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
             OffsetAttribute offset = filter.getAttribute(OffsetAttribute.class);
+            PositionIncrementAttribute position = filter.getAttribute(PositionIncrementAttribute.class);
+            pos=pos+position.getPositionIncrement();
             pinyin.add(ta.toString());
-            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset());
+            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset()+","+pos);
         }
 
         Assert.assertEquals(9, pinyin.size());
@@ -241,11 +244,14 @@ public class PinyinAnalysisTests {
         pinyin = new ArrayList<String>();
         filter.reset();
         System.out.println();
+        pos=0;
         while (filter.incrementToken()) {
             CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
             OffsetAttribute offset = filter.getAttribute(OffsetAttribute.class);
+            PositionIncrementAttribute position = filter.getAttribute(PositionIncrementAttribute.class);
+            pos=pos+position.getPositionIncrement();
             pinyin.add(ta.toString());
-            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset());
+            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset()+","+pos);
         }
 
         Assert.assertEquals(11, pinyin.size());
@@ -282,13 +288,15 @@ public class PinyinAnalysisTests {
         pinyin = new ArrayList<String>();
         filter.reset();
         System.out.println();
+        pos=0;
         while (filter.incrementToken()) {
             CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
             OffsetAttribute offset = filter.getAttribute(OffsetAttribute.class);
+            PositionIncrementAttribute position = filter.getAttribute(PositionIncrementAttribute.class);
+            pos=pos+position.getPositionIncrement();
             pinyin.add(ta.toString());
-            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset());
+            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset()+","+pos);
         }
-
         Assert.assertEquals("liudehua", pinyin.get(0));
         Assert.assertEquals("ldh", pinyin.get(1));
 
@@ -368,9 +376,9 @@ public class PinyinAnalysisTests {
 
         re = result.get("β-氨基酸尿");
         Assert.assertEquals(6, re.size());
-        Assert.assertEquals("β-氨基酸尿", re.get(0).term);
-        Assert.assertEquals("ajsn", re.get(1).term);
-        Assert.assertEquals("an", re.get(2).term);
+        Assert.assertEquals("β-氨基酸尿", re.get(1).term);
+        Assert.assertEquals("ajsn", re.get(2).term);
+        Assert.assertEquals("an", re.get(0).term);
         Assert.assertEquals("ji", re.get(3).term);
         Assert.assertEquals("suan", re.get(4).term);
         Assert.assertEquals("niao", re.get(5).term);
@@ -504,8 +512,8 @@ public class PinyinAnalysisTests {
 
         re = result.get("ceshi");
         Assert.assertEquals("ce", re.get(0).term);
-        Assert.assertEquals("shi", re.get(1).term);
-        Assert.assertEquals("ceshi", re.get(2).term);
+        Assert.assertEquals("shi", re.get(2).term);
+        Assert.assertEquals("ceshi", re.get(1).term);
 
 
 
@@ -690,8 +698,8 @@ public class PinyinAnalysisTests {
         re = result.get("DJ音乐家");
         Assert.assertEquals(3, re.size());
         Assert.assertEquals("d", re.get(0).term);
-        Assert.assertEquals("djyyj", re.get(1).term);
-        Assert.assertEquals("j", re.get(2).term);
+        Assert.assertEquals("djyyj", re.get(2).term);
+        Assert.assertEquals("j", re.get(1).term);
 
 
         config = new PinyinConfig();
@@ -1046,13 +1054,15 @@ public class PinyinAnalysisTests {
 
             boolean hasnext = tokenizer.incrementToken();
 
+            int pos=0;
             ArrayList<TermItem> re = new ArrayList<>();
             while (hasnext) {
                 CharTermAttribute ta = tokenizer.getAttribute(CharTermAttribute.class);
                 PositionIncrementAttribute position = tokenizer.getAttribute(PositionIncrementAttribute.class);
                 OffsetAttribute offset = tokenizer.getAttribute(OffsetAttribute.class);
-                System.out.printf("%s: %d -> %d ,%d\n", ta.toString(), offset.startOffset(), offset.endOffset(),position.getPositionIncrement());
-                re.add(new TermItem(ta.toString(),offset.startOffset(),offset.endOffset(),position.getPositionIncrement()));
+                pos=pos+position.getPositionIncrement();
+                System.out.printf("%s: %d -> %d ,%d\n", ta.toString(), offset.startOffset(), offset.endOffset(),pos);
+                re.add(new TermItem(ta.toString(),offset.startOffset(),offset.endOffset(),pos));
                 hasnext = tokenizer.incrementToken();
             }
             result.put(value, re);
@@ -1142,33 +1152,33 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("liu", re.get(1).term);
         Assert.assertEquals(0, re.get(1).startOffset);
         Assert.assertEquals(1, re.get(1).endOffset);
-        Assert.assertEquals(0, re.get(1).position);
+        Assert.assertEquals(1, re.get(1).position);
 
         Assert.assertEquals("刘德华", re.get(2).term);
         Assert.assertEquals(0, re.get(2).startOffset);
         Assert.assertEquals(3, re.get(2).endOffset);
-        Assert.assertEquals(0, re.get(2).position);
+        Assert.assertEquals(1, re.get(2).position);
         Assert.assertEquals("ldh", re.get(3).term);
         Assert.assertEquals(0, re.get(3).startOffset);
         Assert.assertEquals(3, re.get(3).endOffset);
-        Assert.assertEquals(0, re.get(3).position);
+        Assert.assertEquals(1, re.get(3).position);
 
         Assert.assertEquals("d", re.get(4).term);
         Assert.assertEquals(1, re.get(4).startOffset);
         Assert.assertEquals(2, re.get(4).endOffset);
-        Assert.assertEquals(1, re.get(4).position);
+        Assert.assertEquals(2, re.get(4).position);
         Assert.assertEquals("de", re.get(5).term);
         Assert.assertEquals(1, re.get(5).startOffset);
         Assert.assertEquals(2, re.get(5).endOffset);
-        Assert.assertEquals(0, re.get(5).position);
+        Assert.assertEquals(2, re.get(5).position);
         Assert.assertEquals("h", re.get(6).term);
         Assert.assertEquals(2, re.get(6).startOffset);
         Assert.assertEquals(3, re.get(6).endOffset);
-        Assert.assertEquals(1, re.get(6).position);
+        Assert.assertEquals(3, re.get(6).position);
         Assert.assertEquals("hua", re.get(7).term);
         Assert.assertEquals(2, re.get(7).startOffset);
         Assert.assertEquals(3, re.get(7).endOffset);
-        Assert.assertEquals(0, re.get(7).position);
+        Assert.assertEquals(3, re.get(7).position);
     }
 
     @Test
@@ -1194,27 +1204,75 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("l德华", re.get(1).term);
         Assert.assertEquals(0, re.get(1).startOffset);
         Assert.assertEquals(3, re.get(1).endOffset);
-        Assert.assertEquals(0, re.get(1).position);
+        Assert.assertEquals(1, re.get(1).position);
         Assert.assertEquals("ldh", re.get(2).term);
         Assert.assertEquals(0, re.get(2).startOffset);
         Assert.assertEquals(3, re.get(2).endOffset);
-        Assert.assertEquals(0, re.get(2).position);
+        Assert.assertEquals(1, re.get(2).position);
 
         Assert.assertEquals("d", re.get(3).term);
         Assert.assertEquals(1, re.get(3).startOffset);
         Assert.assertEquals(2, re.get(3).endOffset);
-        Assert.assertEquals(1, re.get(3).position);
+        Assert.assertEquals(2, re.get(3).position);
         Assert.assertEquals("de", re.get(4).term);
         Assert.assertEquals(1, re.get(4).startOffset);
         Assert.assertEquals(2, re.get(4).endOffset);
-        Assert.assertEquals(0, re.get(4).position);
+        Assert.assertEquals(2, re.get(4).position);
         Assert.assertEquals("h", re.get(5).term);
         Assert.assertEquals(2, re.get(5).startOffset);
         Assert.assertEquals(3, re.get(5).endOffset);
-        Assert.assertEquals(1, re.get(5).position);
+        Assert.assertEquals(3, re.get(5).position);
         Assert.assertEquals("hua", re.get(6).term);
         Assert.assertEquals(2, re.get(6).startOffset);
         Assert.assertEquals(3, re.get(6).endOffset);
-        Assert.assertEquals(0, re.get(6).position);
+        Assert.assertEquals(3, re.get(6).position);
+    }
+
+    @Test
+    public void TestPinyinPosition3() throws IOException {
+        String[] s ={ "liude华","liudehua","ldhua","刘de华","刘dehua","DJ音乐家"};
+
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = true;
+        config.keepSeparateFirstLetter = true;
+        config.keepNoneChinese = true;
+        config.keepOriginal = true;
+        config.keepFullPinyin = true;
+        config.keepNoneChineseTogether = true;
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re = result.get("liude华");
+        Assert.assertEquals("liu", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(3, re.get(0).endOffset);
+        Assert.assertEquals(1, re.get(0).position);
+
+        Assert.assertEquals("liude华", re.get(1).term);
+        Assert.assertEquals(0, re.get(1).startOffset);
+        Assert.assertEquals(6, re.get(1).endOffset);
+        Assert.assertEquals(1, re.get(1).position);
+
+        Assert.assertEquals("liudeh", re.get(2).term);
+        Assert.assertEquals(0, re.get(2).startOffset);
+        Assert.assertEquals(6, re.get(2).endOffset);
+        Assert.assertEquals(1, re.get(2).position);
+
+        Assert.assertEquals("de", re.get(3).term);
+        Assert.assertEquals(3, re.get(3).startOffset);
+        Assert.assertEquals(5, re.get(3).endOffset);
+        Assert.assertEquals(2, re.get(3).position);
+
+
+        Assert.assertEquals("h", re.get(4).term);
+        Assert.assertEquals(5, re.get(4).startOffset);
+        Assert.assertEquals(6, re.get(4).endOffset);
+        Assert.assertEquals(3, re.get(4).position);
+
+        Assert.assertEquals("hua", re.get(5).term);
+        Assert.assertEquals(5, re.get(5).startOffset);
+        Assert.assertEquals(6, re.get(5).endOffset);
+        Assert.assertEquals(3, re.get(5).position);
+
     }
 }
