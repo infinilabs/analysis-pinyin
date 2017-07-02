@@ -698,8 +698,8 @@ public class PinyinAnalysisTests {
         re = result.get("DJ音乐家");
         Assert.assertEquals(3, re.size());
         Assert.assertEquals("d", re.get(0).term);
-        Assert.assertEquals("djyyj", re.get(2).term);
-        Assert.assertEquals("j", re.get(1).term);
+        Assert.assertEquals("djyyj", re.get(1).term);
+        Assert.assertEquals("j", re.get(2).term);
 
 
         config = new PinyinConfig();
@@ -1273,6 +1273,68 @@ public class PinyinAnalysisTests {
         Assert.assertEquals(5, re.get(5).startOffset);
         Assert.assertEquals(6, re.get(5).endOffset);
         Assert.assertEquals(3, re.get(5).position);
+
+    }
+
+    @Test
+    public void TestPinyinPosition4() throws IOException {
+        String[] s ={ "medcl"};
+
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = true;
+        config.keepSeparateFirstLetter = true;
+        config.keepNoneChinese = true;
+        config.keepOriginal = true;
+        config.keepFullPinyin = true;
+        config.keepNoneChineseTogether = true;
+
+        HashMap<String, ArrayList<TermItem>> result= getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re = result.get("medcl");
+        Assert.assertEquals("me", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(2, re.get(0).endOffset);
+        Assert.assertEquals(1, re.get(0).position);
+
+        Assert.assertEquals("medcl", re.get(1).term);
+        Assert.assertEquals(0, re.get(1).startOffset);
+        Assert.assertEquals(5, re.get(1).endOffset);
+        Assert.assertEquals(1, re.get(1).position);
+
+        config = new PinyinConfig();
+        config.keepFirstLetter = true;
+        config.keepSeparateFirstLetter = true;
+        config.keepNoneChinese = true;
+        config.keepOriginal = true;
+        config.keepFullPinyin = true;
+        config.keepNoneChineseTogether = false;
+        config.keepJoinedFullPinyin = true;
+
+        result = getStringArrayListHashMap(s, config);
+
+        re = result.get("medcl");
+        Assert.assertEquals("m", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals(1, re.get(0).position);
+
+        Assert.assertEquals("medcl", re.get(1).term);
+        Assert.assertEquals(0, re.get(1).startOffset);
+        Assert.assertEquals(5, re.get(1).endOffset);
+        Assert.assertEquals(1, re.get(1).position);
+
+
+
+        Assert.assertEquals("e", re.get(2).term);
+        Assert.assertEquals(1, re.get(2).startOffset);
+        Assert.assertEquals(2, re.get(2).endOffset);
+        Assert.assertEquals(2, re.get(2).position);
+
+        Assert.assertEquals("d", re.get(3).term);
+        Assert.assertEquals(2, re.get(3).startOffset);
+        Assert.assertEquals(3, re.get(3).endOffset);
+        Assert.assertEquals(3, re.get(3).position);
+
 
     }
 }

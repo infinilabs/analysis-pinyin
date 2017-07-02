@@ -156,7 +156,7 @@ public class PinyinTokenizer extends Tokenizer {
                     //keep original alphabet
                     if (c < 128) {
                         if (buff.length() <= 0) {
-                            buffStartPosition = i;
+                            buffStartPosition = i+1;
                         }
                         if ((c > 96 && c < 123) || (c > 64 && c < 91) || (c > 47 && c < 58)) {
                             if (config.keepNoneChinese) {
