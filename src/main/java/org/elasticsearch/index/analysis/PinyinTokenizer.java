@@ -111,7 +111,6 @@ public class PinyinTokenizer extends Tokenizer {
         offsetAtt.setOffset(correctOffset(startOffset), correctOffset(endOffset));
 
         int offset = position - lastIncrementPosition;
-//        System.out.println("term:"+term+",position:"+position+",last:"+lastIncrementPosition+",offset:"+offset);
         if (offset < 0) {
             offset = 0;
         }

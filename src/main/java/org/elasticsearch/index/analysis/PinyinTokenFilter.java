@@ -52,7 +52,6 @@ public class PinyinTokenFilter extends TokenFilter {
     String source;
     private int lastIncrementPosition = 0;
 
-    private OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private PositionIncrementAttribute positionAttr = addAttribute(PositionIncrementAttribute.class);
 
     public PinyinTokenFilter(TokenStream in, PinyinConfig config) {
