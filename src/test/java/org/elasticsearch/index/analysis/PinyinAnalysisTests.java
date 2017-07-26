@@ -27,7 +27,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 import org.elasticsearch.analysis.PinyinConfig;
 import org.junit.Test;
 import org.nlpcn.commons.lang.pinyin.Pinyin;
@@ -201,18 +200,9 @@ public class PinyinAnalysisTests {
         sr = new StringReader("liu德hua 名字");
         analyzer = new WhitespaceAnalyzer();
         filter = new PinyinTokenFilter(analyzer.tokenStream("f", sr), config);
-        pinyin = new ArrayList<String>();
         filter.reset();
         System.out.println();
-        int pos=0;
-        while (filter.incrementToken()) {
-            CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
-            OffsetAttribute offset = filter.getAttribute(OffsetAttribute.class);
-            PositionIncrementAttribute position = filter.getAttribute(PositionIncrementAttribute.class);
-            pos=pos+position.getPositionIncrement();
-            pinyin.add(ta.toString());
-            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset()+","+pos);
-        }
+        pinyin = getTokenFilterResult(filter);
 
         Assert.assertEquals(9, pinyin.size());
         Assert.assertEquals("liu", pinyin.get(0));
@@ -241,18 +231,11 @@ public class PinyinAnalysisTests {
         sr = new StringReader("liudehuaalibaba13zhuanghan134");
         analyzer = new WhitespaceAnalyzer();
         filter = new PinyinTokenFilter(analyzer.tokenStream("f", sr), config);
-        pinyin = new ArrayList<String>();
+
         filter.reset();
         System.out.println();
-        pos=0;
-        while (filter.incrementToken()) {
-            CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
-            OffsetAttribute offset = filter.getAttribute(OffsetAttribute.class);
-            PositionIncrementAttribute position = filter.getAttribute(PositionIncrementAttribute.class);
-            pos=pos+position.getPositionIncrement();
-            pinyin.add(ta.toString());
-            System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset()+","+pos);
-        }
+
+        pinyin= getTokenFilterResult(filter);
 
         Assert.assertEquals(11, pinyin.size());
         Assert.assertEquals("liu", pinyin.get(0));
@@ -285,10 +268,17 @@ public class PinyinAnalysisTests {
         sr = new StringReader("刘德华");
         analyzer = new WhitespaceAnalyzer();
         filter = new PinyinTokenFilter(analyzer.tokenStream("f", sr), config);
-        pinyin = new ArrayList<String>();
         filter.reset();
-        System.out.println();
-        pos=0;
+        pinyin= getTokenFilterResult(filter);
+        Assert.assertEquals("liudehua", pinyin.get(0));
+        Assert.assertEquals("ldh", pinyin.get(1));
+
+
+    }
+
+    private List<String> getTokenFilterResult(PinyinTokenFilter filter)  throws IOException {
+        List<String> pinyin = new ArrayList<String>();
+        int pos=0;
         while (filter.incrementToken()) {
             CharTermAttribute ta = filter.getAttribute(CharTermAttribute.class);
             OffsetAttribute offset = filter.getAttribute(OffsetAttribute.class);
@@ -297,11 +287,9 @@ public class PinyinAnalysisTests {
             pinyin.add(ta.toString());
             System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset()+","+pos);
         }
-        Assert.assertEquals("liudehua", pinyin.get(0));
-        Assert.assertEquals("ldh", pinyin.get(1));
-
-
+        return pinyin;
     }
+
 
     @Test
     public void TestTokenizer() throws IOException {
@@ -550,7 +538,8 @@ public class PinyinAnalysisTests {
         Assert.assertEquals(2, re.get(1).endOffset);
         Assert.assertEquals(3, re.get(2).endOffset);
     }
-        @Test
+
+    @Test
     public void TestOnlyLetters() throws IOException {
         String[] s1 = new String[]{"ldh"};
         PinyinConfig config = new PinyinConfig();
@@ -671,7 +660,6 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("hua", re.get(5).term);
     }
 
-
     @Test
     public void TestOnlyFirstLetterTokenizer() throws IOException {
         String[] s =
@@ -732,7 +720,6 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("djyyj", re.get(1).term);
 
     }
-
 
     @Test
     public void TestFullJoinedPinyin() throws IOException{
@@ -1128,7 +1115,6 @@ public class PinyinAnalysisTests {
         Assert.assertEquals("ce", result.get(0));
         Assert.assertEquals("shi", result.get(1));
     }
-
 
     @Test
     public void TestPinyinPosition1() throws IOException {
