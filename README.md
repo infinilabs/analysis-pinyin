@@ -54,6 +54,7 @@ The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:
 * `lowercase`  lowercase non Chinese letters, default: true
 * `trim_whitespace` default: true
 * `remove_duplicated_term` when this option enabled, duplicated term will be removed to save index, eg: `de的`>`de`, default: false,  NOTE: position related query maybe influenced
+* `ignore_pinyin_offset` after 6.0, offset is strictly constrained, overlapped tokens are not allowed, with this parameter, overlapped token will allowed by ignore offset, please note, all position related query or highlight will become incorrect, you should use multi fields and specify different settings for different query purpose. if you need offset, please set it to false. default: true.
 
 
 

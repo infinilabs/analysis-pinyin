@@ -108,7 +108,10 @@ public class PinyinTokenizer extends Tokenizer {
         if (endOffset < startOffset) {
             endOffset = startOffset + term.length();
         }
-        offsetAtt.setOffset(correctOffset(startOffset), correctOffset(endOffset));
+
+        if(!config.ignorePinyinOffset){
+            offsetAtt.setOffset(correctOffset(startOffset), correctOffset(endOffset));
+        }
 
         int offset = position - lastIncrementPosition;
         if (offset < 0) {
