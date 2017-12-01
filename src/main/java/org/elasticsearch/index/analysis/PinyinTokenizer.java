@@ -100,6 +100,12 @@ public class PinyinTokenizer extends Tokenizer {
         if (config.trimWhitespace) {
             term = term.trim();
         }
+
+        //ignore empty term
+        if(term.length()==0){
+            return;
+        }
+
         termAtt.setEmpty();
         termAtt.append(term);
         if (startOffset < 0) {
