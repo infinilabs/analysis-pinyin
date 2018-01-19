@@ -16,3 +16,4 @@ deploy:
   on:
     repo: medcl/elasticsearch-analysis-pinyin
     tags: true
+group: deprecated-2017Q4
