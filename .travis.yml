@@ -16,3 +16,4 @@ deploy:
   on:
     repo: medcl/elasticsearch-analysis-pinyin
     tags: true
+    all_branches: true
