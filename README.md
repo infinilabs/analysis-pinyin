@@ -8,7 +8,7 @@ This Pinyin Analysis plugin is used to do conversion between Chinese characters 
     --------------------------------------------------
     | master                        | 6.x -> master  |
     --------------------------------------------------
-    | 6.1.2                         | 6.1.2          |
+    | 6.1.3                         | 6.1.3          |
     --------------------------------------------------
     | 5.6.4                         | 5.6.4          |
     --------------------------------------------------
@@ -60,7 +60,7 @@ The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:
 
 1.Create a index with custom pinyin analyzer
 <pre>
-curl -XPUT http://localhost:9200/medcl/ -d'
+PUT /medcl/ 
 {
     "index" : {
         "analysis" : {
@@ -82,13 +82,16 @@ curl -XPUT http://localhost:9200/medcl/ -d'
             }
         }
     }
-}'
+}
 </pre>
 
 2.Test Analyzer, analyzing a chinese name, such as 刘德华
 <pre>
-http://localhost:9200/medcl/_analyze?text=%e5%88%98%e5%be%b7%e5%8d%8e&analyzer=pinyin_analyzer
-</pre>
+GET /medcl/_analyze
+{
+  "text": ["刘德华"],
+  "analyzer": "pinyin_analyzer"
+}</pre>
 <pre>
 {
   "tokens" : [
@@ -133,7 +136,7 @@ http://localhost:9200/medcl/_analyze?text=%e5%88%98%e5%be%b7%e5%8d%8e&analyzer=p
 
 3.Create mapping
 <pre>
-curl -XPOST http://localhost:9200/medcl/folks/_mapping -d'
+POST /medcl/folks/_mapping 
 {
     "folks": {
         "properties": {
@@ -151,12 +154,13 @@ curl -XPOST http://localhost:9200/medcl/folks/_mapping -d'
             }
         }
     }
-}'
+}
 </pre>
 
 4.Indexing
 <pre>
-curl -XPOST http://localhost:9200/medcl/folks/andy -d'{"name":"刘德华"}'
+POST /medcl/folks/andy 
+{"name":"刘德华"}
 </pre>
 
 5.Let's search
@@ -170,7 +174,7 @@ curl http://localhost:9200/medcl/folks/_search?q=name.pinyin:de+hua
 
 6.Using Pinyin-TokenFilter
 <pre>
-curl -XPUT http://localhost:9200/medcl1/ -d'
+PUT /medcl1/ 
 {
     "index" : {
         "analysis" : {
@@ -195,12 +199,16 @@ curl -XPUT http://localhost:9200/medcl1/ -d'
             }
         }
     }
-}'
+}
 </pre>
 
 Token Test:刘德华 张学友 郭富城 黎明 四大天王
 <pre>
-curl -XGET http://localhost:9200/medcl1/_analyze?text=%e5%88%98%e5%be%b7%e5%8d%8e+%e5%bc%a0%e5%ad%a6%e5%8f%8b+%e9%83%ad%e5%af%8c%e5%9f%8e+%e9%bb%8e%e6%98%8e+%e5%9b%9b%e5%a4%a7%e5%a4%a9%e7%8e%8b&analyzer=user_name_analyzer
+GET /medcl/_analyze
+{
+  "text": ["刘德华 张学友 郭富城 黎明 四大天王"],
+  "analyzer": "user_name_analyzer"
+}
 </pre>
 <pre>
 {
