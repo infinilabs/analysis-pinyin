@@ -7,13 +7,3 @@ script:
   - java -version
 language: java
 script: mvn clean package
-deploy:
-  provider: releases
-  api_key:
-    secure: TnK4FFVPqP/VIWMt07j2cSKqjMNSjslQil6QIJwiffwdonDMS5hLL+xqwvj/GZnDhKuJ8Fhc9xHzpiJWSrKV/kr201wJc55+CkqkA6q5K6ihfMSOfN1kkgqdxAjalJySzMQOPtz7GYwgTGy1PmJ9h2GPNx9hKm/i1d1aJI1H+HM=
-  file: target/releases/elasticsearch-analysis-pinyin-*.zip
-  file_glob: true
-  on:
-    repo: medcl/elasticsearch-analysis-pinyin
-    tags: true
-    all_branches: true
