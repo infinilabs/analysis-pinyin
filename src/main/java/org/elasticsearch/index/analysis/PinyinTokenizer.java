@@ -224,7 +224,7 @@ public class PinyinTokenizer extends Tokenizer {
 
             if (config.keepJoinedFullPinyin && !processedFullPinyinLetter && fullPinyinLetters.length() > 0) {
                 processedFullPinyinLetter = true;
-                addCandidate(new TermItem(fullPinyinLetters.toString(), 0, fullPinyinLetters.length(), 1));
+                addCandidate(new TermItem(fullPinyinLetters.toString(), 0, source.length(), 1));
                 fullPinyinLetters.setLength(0);
             }
 
