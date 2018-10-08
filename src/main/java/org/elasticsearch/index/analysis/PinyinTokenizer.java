@@ -100,6 +100,12 @@ public class PinyinTokenizer extends Tokenizer {
         if (config.trimWhitespace) {
             term = term.trim();
         }
+
+        //ignore empty term
+        if(term.length()==0){
+            return;
+        }
+
         termAtt.setEmpty();
         termAtt.append(term);
         if (startOffset < 0) {
@@ -108,7 +114,10 @@ public class PinyinTokenizer extends Tokenizer {
         if (endOffset < startOffset) {
             endOffset = startOffset + term.length();
         }
-        offsetAtt.setOffset(correctOffset(startOffset), correctOffset(endOffset));
+
+        if(!config.ignorePinyinOffset){
+            offsetAtt.setOffset(correctOffset(startOffset), correctOffset(endOffset));
+        }
 
         int offset = position - lastIncrementPosition;
         if (offset < 0) {

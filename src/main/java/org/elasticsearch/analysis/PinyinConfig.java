@@ -22,6 +22,8 @@ public class PinyinConfig {
     public boolean keepJoinedFullPinyin =false;
     public boolean removeDuplicateTerm=false;
     public boolean fixedPinyinOffset =false;
+    //  after 6.0, offset is strictly constrained, overlapped tokens are not allowed, with this parameter, overlapped token will allowed by ignore offset, please note, all position related query or highlight will become incorrect, you should use multi fields and specify different settings for different query purpose. if you need offset, please set it to false. default: true.
+    public boolean ignorePinyinOffset =true;
 
     public PinyinConfig() {}
     public PinyinConfig(Settings settings) {
@@ -40,5 +42,6 @@ public class PinyinConfig {
         this.keepNoneChineseInJoinedFullPinyin =settings.getAsBoolean("keep_none_chinese_in_joined_full_pinyin", false);
         this.removeDuplicateTerm =settings.getAsBoolean("remove_duplicated_term", false);
         this.fixedPinyinOffset =settings.getAsBoolean("fixed_pinyin_offset", false);
+        this.ignorePinyinOffset =settings.getAsBoolean("ignore_pinyin_offset", true);
     }
 }

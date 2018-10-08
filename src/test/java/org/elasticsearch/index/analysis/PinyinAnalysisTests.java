@@ -49,6 +49,8 @@ public class PinyinAnalysisTests {
         config.keepNoneChinese = true;
         config.keepOriginal = false;
         config.keepFullPinyin = false;
+        config.ignorePinyinOffset = false;
+
 
         StringReader sr = new StringReader("刘德华");
         Analyzer analyzer = new StandardAnalyzer();
@@ -87,6 +89,8 @@ public class PinyinAnalysisTests {
         config.keepNoneChinese = true;
         config.keepOriginal = false;
         config.keepFullPinyin = true;
+        config.ignorePinyinOffset = false;
+
 
         sr = new StringReader("刘德华");
         analyzer = new StandardAnalyzer();
@@ -110,6 +114,8 @@ public class PinyinAnalysisTests {
         config.keepNoneChinese = true;
         config.keepOriginal = true;
         config.keepFullPinyin = true;
+        config.ignorePinyinOffset = false;
+
 
         sr = new StringReader("刘德华");
         analyzer = new StandardAnalyzer();
@@ -140,6 +146,8 @@ public class PinyinAnalysisTests {
         config.keepNoneChinese = true;
         config.keepOriginal = true;
         config.keepFullPinyin = true;
+        config.ignorePinyinOffset = false;
+
 
         sr = new StringReader("刘德华");
         analyzer = new KeywordAnalyzer();
@@ -170,6 +178,8 @@ public class PinyinAnalysisTests {
         config.keepFullPinyin = false;
         config.LimitFirstLetterLength = 5;
         config.lowercase = true;
+        config.ignorePinyinOffset = false;
+
 
         sr = new StringReader("Go的数组是纯粹的值类型，传递一个[N]T的代价是N个T");
         analyzer = new KeywordAnalyzer();
@@ -196,6 +206,8 @@ public class PinyinAnalysisTests {
         config.keepFullPinyin = true;
         config.LimitFirstLetterLength = 5;
         config.lowercase = true;
+        config.ignorePinyinOffset = false;
+
 
         sr = new StringReader("liu德hua 名字");
         analyzer = new WhitespaceAnalyzer();
@@ -227,6 +239,8 @@ public class PinyinAnalysisTests {
         config.lowercase = true;
         config.noneChinesePinyinTokenize=true;
         config.removeDuplicateTerm=false;
+        config.ignorePinyinOffset = false;
+
 
         sr = new StringReader("liudehuaalibaba13zhuanghan134");
         analyzer = new WhitespaceAnalyzer();
@@ -264,6 +278,7 @@ public class PinyinAnalysisTests {
         config.lowercase=true;
         config.trimWhitespace=true;
         config.fixedPinyinOffset =true;
+        config.ignorePinyinOffset = false;
 
         sr = new StringReader("刘德华");
         analyzer = new WhitespaceAnalyzer();
@@ -285,6 +300,8 @@ public class PinyinAnalysisTests {
             PositionIncrementAttribute position = filter.getAttribute(PositionIncrementAttribute.class);
             pos=pos+position.getPositionIncrement();
             pinyin.add(ta.toString());
+            Assert.assertTrue("startOffset must be non-negative",offset.startOffset()>=0);
+            Assert.assertTrue("endOffset must be >= startOffset",offset.startOffset()>=0);
             System.out.println(ta.toString()+","+offset.startOffset()+","+offset.endOffset()+","+pos);
         }
         return pinyin;
@@ -303,6 +320,8 @@ public class PinyinAnalysisTests {
         PinyinConfig config = new PinyinConfig();
         config.noneChinesePinyinTokenize=false;
         config.keepOriginal=true;
+        config.ignorePinyinOffset = false;
+
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
         ArrayList<TermItem> re = result.get("刘德华");
@@ -392,6 +411,8 @@ public class PinyinAnalysisTests {
         config.keepFullPinyin = true;
         config.LimitFirstLetterLength = 5;
         config.lowercase = false;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -416,6 +437,8 @@ public class PinyinAnalysisTests {
         config.LimitFirstLetterLength = 5;
         config.removeDuplicateTerm = true;
         config.lowercase = false;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -438,6 +461,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal=false;
         config.lowercase=true;
         config.trimWhitespace=true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -457,6 +482,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal=false;
         config.lowercase=true;
         config.trimWhitespace=true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -476,6 +503,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal=false;
         config.lowercase=true;
         config.trimWhitespace=true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -495,6 +524,8 @@ public class PinyinAnalysisTests {
         config.LimitFirstLetterLength=16;
         config.noneChinesePinyinTokenize=true;
         config.lowercase=true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -522,6 +553,8 @@ public class PinyinAnalysisTests {
         config.LimitFirstLetterLength = 16;
         config.noneChinesePinyinTokenize = true;
         config.lowercase = true;
+        config.ignorePinyinOffset = false;
+
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s1, config);
 
@@ -553,6 +586,8 @@ public class PinyinAnalysisTests {
         config.LimitFirstLetterLength=16;
         config.noneChinesePinyinTokenize=true;
         config.lowercase=true;
+        config.ignorePinyinOffset = false;
+
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s1, config);
 
@@ -582,6 +617,8 @@ public class PinyinAnalysisTests {
         config.LimitFirstLetterLength=16;
         config.noneChinesePinyinTokenize=true;
         config.lowercase=true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -605,6 +642,8 @@ public class PinyinAnalysisTests {
         config.LimitFirstLetterLength=16;
         config.noneChinesePinyinTokenize=true;
         config.lowercase=true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -626,6 +665,8 @@ public class PinyinAnalysisTests {
         config.LimitFirstLetterLength=16;
         config.noneChinesePinyinTokenize=true;
         config.lowercase=true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -648,6 +689,8 @@ public class PinyinAnalysisTests {
         config.LimitFirstLetterLength=16;
         config.noneChinesePinyinTokenize=true;
         config.lowercase=true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s1, config);
 
@@ -672,6 +715,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal = false;
         config.keepFullPinyin = false;
         config.keepNoneChineseTogether = false;
+        config.ignorePinyinOffset = false;
+
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
@@ -697,6 +742,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal = false;
         config.keepFullPinyin = false;
         config.keepNoneChineseTogether = false;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s, config);
 
@@ -712,6 +759,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal = false;
         config.keepFullPinyin = false;
         config.noneChinesePinyinTokenize=false;
+        config.ignorePinyinOffset = false;
+
         result = getStringArrayListHashMap(s, config);
 
         re = result.get("DJ音乐家");
@@ -736,6 +785,8 @@ public class PinyinAnalysisTests {
         config.keepJoinedFullPinyin=true;
         config.keepNoneChineseTogether = true;
         config.keepNoneChineseInJoinedFullPinyin=true;
+        config.ignorePinyinOffset = false;
+
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
         ArrayList<TermItem> re = result.get("DJ音乐家");
@@ -759,6 +810,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal = true;
         config.keepFullPinyin = true;
         config.keepNoneChineseTogether = true;
+        config.ignorePinyinOffset = false;
+
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
@@ -814,6 +867,8 @@ public class PinyinAnalysisTests {
         config.removeDuplicateTerm = true;
         config.fixedPinyinOffset=false;
         config.keepJoinedFullPinyin=false;
+        config.ignorePinyinOffset = false;
+
 
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
@@ -889,6 +944,7 @@ public class PinyinAnalysisTests {
         config.keepFullPinyin = true;
         config.keepNoneChineseTogether = true;
         config.fixedPinyinOffset=false;
+        config.ignorePinyinOffset = false;
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
@@ -963,6 +1019,8 @@ public class PinyinAnalysisTests {
         config.keepFullPinyin = true;
         config.keepNoneChineseTogether = true;
         config.fixedPinyinOffset=true;
+        config.ignorePinyinOffset = false;
+
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
@@ -1127,6 +1185,7 @@ public class PinyinAnalysisTests {
         config.keepOriginal = true;
         config.keepFullPinyin = true;
         config.keepNoneChineseTogether = true;
+        config.ignorePinyinOffset = false;
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
@@ -1178,6 +1237,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal = true;
         config.keepFullPinyin = true;
         config.keepNoneChineseTogether = true;
+        config.ignorePinyinOffset = false;
+
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
@@ -1225,6 +1286,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal = true;
         config.keepFullPinyin = true;
         config.keepNoneChineseTogether = true;
+        config.ignorePinyinOffset = false;
+
 
         HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
 
@@ -1273,6 +1336,8 @@ public class PinyinAnalysisTests {
         config.keepOriginal = true;
         config.keepFullPinyin = true;
         config.keepNoneChineseTogether = true;
+        config.ignorePinyinOffset = false;
+
 
         HashMap<String, ArrayList<TermItem>> result= getStringArrayListHashMap(s, config);
 
@@ -1295,6 +1360,8 @@ public class PinyinAnalysisTests {
         config.keepFullPinyin = true;
         config.keepNoneChineseTogether = false;
         config.keepJoinedFullPinyin = true;
+        config.ignorePinyinOffset = false;
+
 
         result = getStringArrayListHashMap(s, config);
 
