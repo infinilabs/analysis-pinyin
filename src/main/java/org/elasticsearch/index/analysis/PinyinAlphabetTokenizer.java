@@ -135,7 +135,6 @@ public class PinyinAlphabetTokenizer {
                 }
             }
             if (!match) { //一个也没命中
-                pinyinList.add(sixStr.substring(sixStr.length() - 1));
                 noMatchBuffer.append(sixStr.substring(sixStr.length() - 1));
                 end--;
             } else {
