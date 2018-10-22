@@ -1,6 +1,5 @@
 package org.elasticsearch.index.analysis;
 
-
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -21,10 +20,11 @@ public class PinyinAlphabetTokenizerTest {
         Assert.assertEquals(Arrays.asList("wo", "shi", "liang").toString(),
                 PinyinAlphabetTokenizer.walk("woshiliang").toString());
 
-        Assert.assertEquals(Arrays.asList("zhong", "hua", "ren","min","gong","he","guo").toString(),
+        Assert.assertEquals(Arrays.asList("zhong", "hua", "ren", "min", "gong", "he", "guo").toString(),
                 PinyinAlphabetTokenizer.walk("zhonghuarenmingongheguo").toString());
-        Assert.assertEquals(Arrays.asList("zhong", "hua", "ren","8","min","gong","he","guo").toString(),
-                PinyinAlphabetTokenizer.walk("zhonghuaren8mingongheguo").toString());
+        Assert.assertEquals(
+                Arrays.asList("5", "zhong", "hua", "ren", "89", "min", "gong", "he", "guo", "234").toString(),
+                PinyinAlphabetTokenizer.walk("5zhonghuaren89mingongheguo234").toString());
     }
 
 }
