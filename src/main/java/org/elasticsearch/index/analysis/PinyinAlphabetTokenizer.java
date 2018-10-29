@@ -10,73 +10,150 @@ import java.util.*;
  */
 public class PinyinAlphabetTokenizer {
 
-        public static List<String> walk(String text) {
-            int maxLength=6;
-            text = text.toLowerCase();
-            LinkedList<String> candidates=new LinkedList<>();
-            StringBuffer buffer=new StringBuffer();
-            boolean lastWord=true;
-            for (int i = 0; i < text.length(); i++) {
-                char c = text.charAt(i);
-                if ((c > 96 && c < 123) || (c > 64 && c < 91)) {
-                    if(!lastWord){
-                        String str = buffer.toString();
-                        buffer.setLength(0);
-                        candidates.add(str);
-                    }
-                    buffer.append(c);
-                    lastWord=true;
-                }else{
-                    //meet non letter
-                    if(lastWord){
-                        parse(candidates, buffer,true);
-                        if(buffer.length()>0){
-                            String str = buffer.toString();
-                            buffer.setLength(0);
-                            candidates.add(str);
-                        }
-                    }
-                    buffer.append(c);
-                    lastWord=false;
-                }
+    private static final int PINYIN_MAX_LENGTH = 6;
 
-                //start to check pinyin
-                if(buffer.length()>=maxLength){
-                    parse(candidates, buffer,false);
-                }
-            }
-
-            //cleanup
-            if(lastWord){
-                parse(candidates,buffer,true);
-            }
-
-            //final cleanup
-            if(buffer.length()>0){
-                candidates.add(buffer.toString());
-            }
-
-            return candidates;
-        }
-
-    private static void parse(LinkedList<String> candidates, StringBuffer buffer,Boolean last) {
-        for (int j = 0; j < buffer.length(); j++) {
-            String guess=buffer.substring(0,buffer.length()-j);
-            if(PinyinAlphabetDict.getInstance().match(guess)){
-                candidates.add(guess);
-                String left=buffer.substring(buffer.length()-j,buffer.length());
-                buffer.setLength(0);
-                buffer.append(left);
-                if(!last){
-                    break;
-                }else{
-                    if(left.length()>0){
-                        parse(candidates,buffer,last);
-                    }
-                }
-            }
-        }
+    public static List<String> walk(String text) {
+        return segPinyinStr(text);
     }
+
+    private static List<String> segPinyinStr(String content) {
+        String pinyinStr = content;
+        pinyinStr = pinyinStr.toLowerCase();
+        // 按非letter切分
+        List<String> pinyinStrList = splitByNoletter(pinyinStr);
+        List<String> pinyinList = new ArrayList<>();
+        for (String pinyinText : pinyinStrList) {
+            if (pinyinText.length() == 1) {
+                pinyinList.add(pinyinText);
+            } else {
+                List<String> forward = positiveMaxMatch(pinyinText, PINYIN_MAX_LENGTH);
+                if (forward.size() == 1) { // 前向只切出1个的话，没有必要再做逆向分词
+                    pinyinList.addAll(forward);
+                } else {
+                    // 分别正向、逆向最大匹配，选出最短的作为最优结果
+                    List<String> backward = reverseMaxMatch(pinyinText, PINYIN_MAX_LENGTH);
+                    if (forward.size() <= backward.size()) {
+                        pinyinList.addAll(forward);
+                    } else {
+                        pinyinList.addAll(backward);
+                    }
+                }
+            }
+        }
+        return pinyinList;
+    }
+
+    private static List<String> splitByNoletter(String pinyinStr) {
+        List<String> pinyinStrList = new ArrayList<>();
+        StringBuffer sb = new StringBuffer();
+        boolean lastWord = true;
+        for (char c : pinyinStr.toCharArray()) {
+            if ((c > 96 && c < 123) || (c > 64 && c < 91)) {
+                if (!lastWord){
+                    pinyinStrList.add(sb.toString());
+                    sb.setLength(0);
+                }
+                sb.append(c);
+                lastWord = true;
+            } else {
+                if (lastWord & sb.length()>0) {
+                    pinyinStrList.add(sb.toString());
+                    sb.setLength(0);
+                }
+                sb.append(c);
+                lastWord = false;
+            }
+        }
+        if (sb.length() > 0) {
+            pinyinStrList.add(sb.toString());
+        }
+        return pinyinStrList;
+
+    }
+
+    private static List<String> positiveMaxMatch(String pinyinText, int maxLength) {
+
+        List<String> pinyinList = new ArrayList<>();
+        StringBuffer noMatchBuffer = new StringBuffer();
+        for (int start = 0; start < pinyinText.length(); ) {
+            int end = start + maxLength;
+            if (end > pinyinText.length()) {
+                end = pinyinText.length();
+            }
+            if (start == end) {
+                break;
+            }
+            String sixStr = pinyinText.substring(start, end);
+            boolean match = false;
+            for (int j = 0; j < sixStr.length(); j++) {
+                String guess = sixStr.substring(0, sixStr.length() - j);
+                if (PinyinAlphabetDict.getInstance().match(guess)) {
+                    pinyinList.add(guess);
+                    start += guess.length();
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) { //没命中,向后移动一位
+                noMatchBuffer.append(sixStr.substring(0, 1));
+                start++;
+            }else { // 命中，加上之前没命中的，并清空
+                if (noMatchBuffer.length() > 0) {
+                    pinyinList.add(noMatchBuffer.toString());
+                    noMatchBuffer.setLength(0);
+                }
+            }
+        }
+        if (noMatchBuffer.length() > 0) {
+            pinyinList.add(noMatchBuffer.toString());
+            noMatchBuffer.setLength(0);
+        }
+
+        return pinyinList;
+    }
+
+    private static List<String> reverseMaxMatch(String pinyinText, int maxLength) {
+        List<String> pinyinList = new ArrayList<>();
+        StringBuffer noMatchBuffer = new StringBuffer();
+        for (int end = pinyinText.length(); end >= 0; ) {
+            int start = end - maxLength;
+            if (start < 0) {
+                start = 0;
+            }
+            if (start == end) {
+                break;
+            }
+            boolean match = false;
+            String sixStr = pinyinText.substring(start, end);
+            for (int j = 0; j < sixStr.length(); j++) {
+                String guess = sixStr.substring(j);
+                if (PinyinAlphabetDict.getInstance().match(guess)) {
+                    pinyinList.add(guess);
+                    end -= guess.length();
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) { //一个也没命中
+                noMatchBuffer.append(sixStr.substring(sixStr.length() - 1));
+                end--;
+            } else {
+                if (noMatchBuffer.length() > 0) {
+                    pinyinList.add(noMatchBuffer.toString());
+                    noMatchBuffer.setLength(0);
+                }
+            }
+        }
+
+        if (noMatchBuffer.length() > 0) {
+            pinyinList.add(noMatchBuffer.toString());
+            noMatchBuffer.setLength(0);
+        }
+        // reverse 保持切词顺序
+        Collections.reverse(pinyinList);
+        return pinyinList;
+    }
+
 
 }
 
