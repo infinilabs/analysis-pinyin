@@ -39,7 +39,8 @@ import java.util.List;
 
 /**
  */
-public class PinyinAnalysisTests {
+
+public class PinyinAnalysisTest {
 
 
     @Test
