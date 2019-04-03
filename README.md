@@ -295,53 +295,95 @@ GET /medcl/_analyze
 - option 2
     <pre>
 
-    PUT /medcl/
-    {
-        "index" : {
-            "analysis" : {
-                "analyzer" : {
-                    "pinyin_analyzer" : {
-                        "tokenizer" : "my_pinyin"
-                        }
-                },
-                "tokenizer" : {
-                    "my_pinyin" : {
-                        "type" : "pinyin",
-                        "keep_first_letter":false,
-                        "keep_separate_first_letter" : true,
-                        "keep_full_pinyin" : false,
-                        "keep_original" : false,
-                        "limit_first_letter_length" : 16,
-                        "lowercase" : true
-                    }
-                }
-            }
-        }
-    }
-
-    POST /medcl/folks/andy
-    {"name":"刘德华"}
-
-    GET /medcl/folks/_search
-    {
-      "query": {"match_phrase": {
-        "name.pinyin": "刘德h"
-      }}
-    }
-
-    GET /medcl/folks/_search
-    {
-      "query": {"match_phrase": {
-        "name.pinyin": "刘dh"
-      }}
-    }
-
-    GET /medcl/folks/_search
-    {
-      "query": {"match_phrase": {
-        "name.pinyin": "dh"
-      }}
-    }
+ DELETE medcl
+ 
+ PUT /medcl/
+   {
+       "index" : {
+           "analysis" : {
+               "analyzer" : {
+                   "pinyin_analyzer" : {
+                       "tokenizer" : "my_pinyin"
+                       }
+               },
+               "tokenizer" : {
+                   "my_pinyin" : {
+                       "type" : "pinyin",
+                       "keep_first_letter":true,
+                       "keep_separate_first_letter" : true,
+                       "keep_full_pinyin" : true,
+                       "keep_original" : false,
+                       "limit_first_letter_length" : 16,
+                       "lowercase" : true
+                   }
+               }
+           }
+       }
+   }
+   
+ POST /medcl/folks/_mapping 
+ {
+     "folks": {
+         "properties": {
+             "name": {
+                 "type": "keyword",
+                 "fields": {
+                     "pinyin": {
+                         "type": "text",
+                         "store": false,
+                         "term_vector": "with_offsets",
+                         "analyzer": "pinyin_analyzer",
+                         "boost": 10
+                     }
+                 }
+             }
+         }
+     }
+ }
+   
+   GET /medcl/_analyze
+ {
+   "text": ["刘德华"],
+   "analyzer": "pinyin_analyzer"
+ }
+ 
+   POST /medcl/folks/andy
+   {"name":"刘德华"}
+   
+   GET /medcl/folks/_search
+   {
+     "query": {"match_phrase": {
+       "name.pinyin": "刘德h"
+     }}
+   }
+ 
+   GET /medcl/folks/_search
+   {
+     "query": {"match_phrase": {
+       "name.pinyin": "刘dh"
+     }}
+   }
+ 
+   GET /medcl/folks/_search
+   {
+     "query": {"match_phrase": {
+       "name.pinyin": "liudh"
+     }}
+   }
+ 
+   GET /medcl/folks/_search
+   {
+     "query": {"match_phrase": {
+       "name.pinyin": "liudeh"
+     }}
+   }
+   
+   GET /medcl/folks/_search
+   {
+     "query": {"match_phrase": {
+       "name.pinyin": "liude华"
+     }}
+   }
 
     </pre>
 
