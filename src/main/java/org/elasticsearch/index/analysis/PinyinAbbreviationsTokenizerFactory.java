@@ -9,7 +9,7 @@ import org.elasticsearch.index.IndexSettings;
 public class PinyinAbbreviationsTokenizerFactory extends AbstractTokenizerFactory {
 
     public PinyinAbbreviationsTokenizerFactory(IndexSettings indexSettings, Environment env, String name, Settings settings) {
-        super(indexSettings, name, settings);
+        super(indexSettings, settings);
     }
 
     @Override
