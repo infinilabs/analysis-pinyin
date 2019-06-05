@@ -305,6 +305,7 @@ public class PinyinTokenizer extends Tokenizer {
         this.processedFirstLetter = false;
         this.processedFullPinyinLetter = false;
         this.processedOriginal = false;
+        this.processedSortCandidate = false;
         firstLetters.setLength(0);
         fullPinyinLetters.setLength(0);
         termsFilter.clear();
