@@ -293,6 +293,10 @@ public class PinyinTokenizer extends Tokenizer {
     @Override
     public final void end() throws IOException {
         super.end();
+        if(!config.ignorePinyinOffset){
+            ++lastOffset;
+            offsetAtt.setOffset(correctOffset(lastOffset), correctOffset(lastOffset));
+        }
     }
 
     @Override
@@ -312,6 +316,7 @@ public class PinyinTokenizer extends Tokenizer {
         candidate.clear();
         source = null;
         lastIncrementPosition = 0;
+        lastOffset = 0;
     }
 
 
