@@ -76,11 +76,11 @@ public class PinyinTokenizer extends Tokenizer {
         }
 
         //remove same term with same position
-        String fr=term+item.position;
+        String fr = term + item.position;
 
         //remove same term, regardless position
         if (config.removeDuplicateTerm) {
-             fr=term;
+            fr = term;
         }
 
         if (termsFilter.contains(fr)) {
@@ -102,7 +102,7 @@ public class PinyinTokenizer extends Tokenizer {
         }
 
         //ignore empty term
-        if(term.length()==0){
+        if (term.length() == 0) {
             return;
         }
 
@@ -115,7 +115,7 @@ public class PinyinTokenizer extends Tokenizer {
             endOffset = startOffset + term.length();
         }
 
-        if(!config.ignorePinyinOffset){
+        if (!config.ignorePinyinOffset) {
             offsetAtt.setOffset(correctOffset(startOffset), correctOffset(endOffset));
         }
 
@@ -160,21 +160,21 @@ public class PinyinTokenizer extends Tokenizer {
                 position = 0;
 
                 for (int i = 0; i < source.length(); i++) {
+
                     char c = source.charAt(i);
                     //keep original alphabet
                     if (c < 128) {
                         if (buff.length() <= 0) {
-                            buffStartPosition = i+1;
+                            buffStartPosition = i;
                         }
                         if ((c > 96 && c < 123) || (c > 64 && c < 91) || (c > 47 && c < 58)) {
                             if (config.keepNoneChinese) {
-                                if (config.keepNoneChinese) {
-                                    if (config.keepNoneChineseTogether) {
-                                        buff.append(c);
-                                        buffSize++;
-                                    } else {
-                                        addCandidate(new TermItem(String.valueOf(c), i, i + 1, buffStartPosition));
-                                    }
+                                if (config.keepNoneChineseTogether) {
+                                    buff.append(c);
+                                    buffSize++;
+                                } else {
+                                    position++;
+                                    addCandidate(new TermItem(String.valueOf(c), i, i + 1, buffStartPosition + 1));
                                 }
                             }
                             if (config.keepNoneChineseInFirstLetter) {
@@ -191,14 +191,20 @@ public class PinyinTokenizer extends Tokenizer {
                             buffSize = parseBuff(buff, buffSize, buffStartPosition);
                         }
 
+                        boolean incrPosition = false;
+
                         String pinyin = pinyinList.get(i);
                         if (pinyin != null && pinyin.length() > 0) {
-                            position++;
                             firstLetters.append(pinyin.charAt(0));
                             if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
+                                position++;
+                                incrPosition = true;
                                 addCandidate(new TermItem(String.valueOf(pinyin.charAt(0)), i, i + 1, position));
                             }
                             if (config.keepFullPinyin) {
+                                if (!incrPosition) {
+                                    position++;
+                                }
                                 addCandidate(new TermItem(pinyin, i, i + 1, position));
                             }
                             if (config.keepJoinedFullPinyin) {
@@ -277,11 +283,13 @@ public class PinyinTokenizer extends Tokenizer {
                     } else {
                         end = start + t.length();
                     }
-                    addCandidate(new TermItem(result.get(i), start, end, ++position));
+                    position++;
+                    addCandidate(new TermItem(result.get(i), start, end, position));
                     start = end;
                 }
             } else if (config.keepFirstLetter || config.keepSeparateFirstLetter || config.keepFullPinyin || !config.keepNoneChineseInJoinedFullPinyin) {
-                addCandidate(new TermItem(buff.toString(), lastOffset - buffSize, lastOffset, ++position));
+                position++;
+                addCandidate(new TermItem(buff.toString(), lastOffset - buffSize, lastOffset, position));
             }
         }
 
@@ -293,6 +301,10 @@ public class PinyinTokenizer extends Tokenizer {
     @Override
     public final void end() throws IOException {
         super.end();
+        if (!config.ignorePinyinOffset) {
+            ++lastOffset;
+            offsetAtt.setOffset(correctOffset(lastOffset), correctOffset(lastOffset));
+        }
     }
 
     @Override
@@ -312,6 +324,7 @@ public class PinyinTokenizer extends Tokenizer {
         candidate.clear();
         source = null;
         lastIncrementPosition = 0;
+        lastOffset = 0;
     }
 
 

@@ -767,7 +767,9 @@ public class PinyinAnalysisTest {
         re = result.get("DJ音乐家");
         Assert.assertEquals(2, re.size());
         Assert.assertEquals("dj", re.get(0).term);
+        Assert.assertEquals(1, re.get(0).position);
         Assert.assertEquals("djyyj", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).position);
 
     }
 
@@ -1274,7 +1276,99 @@ public class PinyinAnalysisTest {
         Assert.assertEquals(2, re.get(6).startOffset);
         Assert.assertEquals(3, re.get(6).endOffset);
         Assert.assertEquals(3, re.get(6).position);
+
+
+
     }
+
+    @Test
+    public void TestPinyinPositionWithNonChinese() throws IOException {
+        String[] s ={
+                "l德华",
+                "liu德华"
+        };
+
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = false;
+        config.keepSeparateFirstLetter = true;
+
+        config.keepNoneChinese = true;
+        config.keepNoneChineseTogether=false;
+
+        config.keepNoneChineseInFirstLetter=true;
+        config.keepOriginal = false;
+        config.keepFullPinyin = false;
+        config.ignorePinyinOffset = false;
+
+
+        HashMap<String, ArrayList<TermItem>>  result = getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re = result.get("l德华");
+        Assert.assertEquals("l", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals(1, re.get(0).position);
+
+        Assert.assertEquals("d", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+        Assert.assertEquals(2, re.get(1).position);
+
+        Assert.assertEquals("h", re.get(2).term);
+        Assert.assertEquals(2, re.get(2).startOffset);
+        Assert.assertEquals(3, re.get(2).endOffset);
+        Assert.assertEquals(3, re.get(2).position);
+
+
+        config = new PinyinConfig();
+        config.keepFirstLetter = false;
+        config.keepSeparateFirstLetter = true;
+
+        config.keepNoneChinese = true;
+        config.keepNoneChineseTogether=true;
+
+        config.keepNoneChineseInFirstLetter=true;
+        config.keepOriginal = false;
+        config.keepFullPinyin = false;
+        config.ignorePinyinOffset = false;
+
+
+        result = getStringArrayListHashMap(s, config);
+
+        re = result.get("l德华");
+        Assert.assertEquals("l", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals(1, re.get(0).position);
+
+        Assert.assertEquals("d", re.get(1).term);
+        Assert.assertEquals(1, re.get(1).startOffset);
+        Assert.assertEquals(2, re.get(1).endOffset);
+        Assert.assertEquals(2, re.get(1).position);
+
+        Assert.assertEquals("h", re.get(2).term);
+        Assert.assertEquals(2, re.get(2).startOffset);
+        Assert.assertEquals(3, re.get(2).endOffset);
+        Assert.assertEquals(3, re.get(2).position);
+
+        re = result.get("liu德华");
+        Assert.assertEquals("liu", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(3, re.get(0).endOffset);
+        Assert.assertEquals(1, re.get(0).position);
+
+        Assert.assertEquals("d", re.get(1).term);
+        Assert.assertEquals(3, re.get(1).startOffset);
+        Assert.assertEquals(4, re.get(1).endOffset);
+        Assert.assertEquals(2, re.get(1).position);
+
+        Assert.assertEquals("h", re.get(2).term);
+        Assert.assertEquals(4, re.get(2).startOffset);
+        Assert.assertEquals(5, re.get(2).endOffset);
+        Assert.assertEquals(3, re.get(2).position);
+
+    }
+
 
     @Test
     public void TestPinyinPosition3() throws IOException {
