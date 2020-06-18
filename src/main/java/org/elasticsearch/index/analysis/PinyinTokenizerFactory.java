@@ -11,7 +11,7 @@ public class PinyinTokenizerFactory extends AbstractTokenizerFactory {
     private PinyinConfig config;
 
     public PinyinTokenizerFactory(IndexSettings indexSettings, Environment env, String name, Settings settings) {
-        super(indexSettings, settings, name);
+        super(indexSettings, name,settings);
         config=new PinyinConfig(settings);
     }
 
