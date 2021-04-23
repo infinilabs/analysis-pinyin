@@ -45,7 +45,7 @@ public class PinyinTokenizer extends Tokenizer {
         this.config = config;
 
         //validate config
-        if (!(config.keepFirstLetter || config.keepSeparateFirstLetter || config.keepFullPinyin || config.keepJoinedFullPinyin)) {
+        if (!(config.keepFirstLetter || config.keepSeparateFirstLetter || config.keepFullPinyin || config.keepJoinedFullPinyin || config.keepSeparateChinese)) {
             throw new ConfigErrorException("pinyin config error, can't disable separate_first_letter, first_letter and full_pinyin at the same time.");
         }
         candidate = new ArrayList<>();
@@ -151,7 +151,8 @@ public class PinyinTokenizer extends Tokenizer {
                 source = termAtt.toString();
 
                 List<String> pinyinList = Pinyin.pinyin(source);
-                if (pinyinList.size() == 0) return false;
+                List<String> chineseList = ChineseUtil.segmentChinese(source);
+                if (pinyinList.size() == 0 || chineseList.size() == 0) return false;
 
                 StringBuilder buff = new StringBuilder();
                 int buffStartPosition = 0;
@@ -194,6 +195,7 @@ public class PinyinTokenizer extends Tokenizer {
                         boolean incrPosition = false;
 
                         String pinyin = pinyinList.get(i);
+                        String chinese = chineseList.get(i);
                         if (pinyin != null && pinyin.length() > 0) {
                             firstLetters.append(pinyin.charAt(0));
                             if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
@@ -206,6 +208,9 @@ public class PinyinTokenizer extends Tokenizer {
                                     position++;
                                 }
                                 addCandidate(new TermItem(pinyin, i, i + 1, position));
+                            }
+                            if(config.keepSeparateChinese){
+                                addCandidate(new TermItem(chinese, i, i + 1, position));
                             }
                             if (config.keepJoinedFullPinyin) {
                                 fullPinyinLetters.append(pinyin);

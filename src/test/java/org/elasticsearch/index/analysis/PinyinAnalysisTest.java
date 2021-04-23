@@ -850,6 +850,47 @@ public class PinyinAnalysisTest {
     }
 
     @Test
+    public void TestMixedPinyinTokenizer2() throws IOException {
+        String[] s =
+                {
+                        "ldh",
+                        "ldhua",
+                        "ld华",
+                        "刘德华",
+                        "刘de华",
+                        "liude华",
+                        " liude 华"};
+
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = false;
+        config.keepSeparateFirstLetter = false;
+        config.keepNoneChinese = true;
+        config.keepOriginal = true;
+        config.keepFullPinyin = false;
+        config.keepNoneChineseTogether = true;
+        config.ignorePinyinOffset = false;
+        config.keepSeparateChinese = true;
+
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re = result.get("ldh");
+        Assert.assertEquals(4, re.size());
+        Assert.assertEquals("l", re.get(0).term);
+        Assert.assertEquals("ldh", re.get(1).term);
+
+        re = result.get("ldhua");
+        Assert.assertEquals(4, re.size());
+        Assert.assertEquals("l", re.get(0).term);
+        Assert.assertEquals("hua", re.get(3).term);
+
+        re = result.get("ld华");
+        Assert.assertEquals(4, re.size());
+        Assert.assertEquals("华", re.get(3).term);
+
+    }
+
+    @Test
     public void TestPinyinTokenizerOffsetWithExtraTerms() throws IOException {
         String[] s =
                 {
