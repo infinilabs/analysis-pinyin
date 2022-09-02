@@ -15,7 +15,7 @@ public class PinyinAnalyzerProvider extends AbstractIndexAnalyzerProvider<Pinyin
 
     @Inject
     public PinyinAnalyzerProvider(IndexSettings indexSettings, Environment env, String name, Settings settings) {
-        super(indexSettings, name, settings);
+        super(name, settings);
         config=new PinyinConfig(settings);
         analyzer = new PinyinAnalyzer(config);
     }
