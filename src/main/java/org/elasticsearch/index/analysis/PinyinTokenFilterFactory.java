@@ -12,7 +12,7 @@ public class PinyinTokenFilterFactory extends AbstractTokenFilterFactory {
 
 
     public PinyinTokenFilterFactory(IndexSettings indexSettings, Environment environment, String name, Settings settings) {
-        super(name, settings);
+        super(indexSettings,name, settings);
        config=new PinyinConfig(settings);
     }
 
