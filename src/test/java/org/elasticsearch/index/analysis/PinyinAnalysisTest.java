@@ -1485,4 +1485,57 @@ public class PinyinAnalysisTest {
 
 
     }
+
+    @Test
+    public void TestPinyinPosition5() throws IOException {
+        String[] s = {"WC-20%权益","刘德华(香港)精选M类"};
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = true;
+        config.keepOriginal = false;
+        config.ignorePinyinOffset = false;
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
+        ArrayList<TermItem> re = result.get("WC-20%权益");
+        Assert.assertEquals("w", re.get(0).term);
+        Assert.assertEquals(0, re.get(0).startOffset);
+        Assert.assertEquals(1, re.get(0).endOffset);
+        Assert.assertEquals(1, re.get(0).position);
+
+        Assert.assertEquals("wc20qy", re.get(1).term);
+        Assert.assertEquals(0, re.get(1).startOffset);
+        Assert.assertEquals(6, re.get(1).endOffset);
+        Assert.assertEquals(1, re.get(1).position);
+
+        Assert.assertEquals("c", re.get(2).term);
+        Assert.assertEquals(1, re.get(2).startOffset);
+        Assert.assertEquals(2, re.get(2).endOffset);
+        Assert.assertEquals(2, re.get(2).position);
+
+        Assert.assertEquals("20", re.get(3).term);
+        Assert.assertEquals(3, re.get(3).startOffset);
+        Assert.assertEquals(5, re.get(3).endOffset);
+        Assert.assertEquals(3, re.get(3).position);
+
+        Assert.assertEquals("quan", re.get(4).term);
+        Assert.assertEquals(6, re.get(4).startOffset);
+        Assert.assertEquals(7, re.get(4).endOffset);
+        Assert.assertEquals(4, re.get(4).position);
+
+        Assert.assertEquals("yi", re.get(5).term);
+        Assert.assertEquals(7, re.get(5).startOffset);
+        Assert.assertEquals(8, re.get(5).endOffset);
+        Assert.assertEquals(5, re.get(5).position);
+
+        re = result.get("刘德华(香港)精选M类");
+        Assert.assertEquals("xuan", re.get(7).term);
+        Assert.assertEquals(8, re.get(7).startOffset);
+        Assert.assertEquals(9, re.get(7).endOffset);
+        Assert.assertEquals(7, re.get(7).position);
+
+        Assert.assertEquals("m", re.get(8).term);
+        Assert.assertEquals(9, re.get(8).startOffset);
+        Assert.assertEquals(10, re.get(8).endOffset);
+        Assert.assertEquals(8, re.get(8).position);
+
+    }
 }
