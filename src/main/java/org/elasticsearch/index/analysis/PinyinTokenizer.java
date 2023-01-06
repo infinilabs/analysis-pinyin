@@ -16,7 +16,6 @@ import java.util.List;
 
 public class PinyinTokenizer extends Tokenizer {
 
-
     private static final int DEFAULT_BUFFER_SIZE = 256;
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
     private boolean done = false;
@@ -156,6 +155,7 @@ public class PinyinTokenizer extends Tokenizer {
                 StringBuilder buff = new StringBuilder();
                 int buffStartPosition = 0;
                 int buffSize = 0;
+                int[] specialCharPosition = new int[source.length()];
 
                 position = 0;
 
@@ -183,12 +183,19 @@ public class PinyinTokenizer extends Tokenizer {
                             if (config.keepNoneChineseInJoinedFullPinyin) {
                                 fullPinyinLetters.append(c);
                             }
+                        }else{
+                            //handle special charset
+                            specialCharPosition[i]=1;
+                            ++buffSize;
                         }
                     } else {
 
                         //clean previous temp
                         if (buff.length() > 0) {
-                            buffSize = parseBuff(buff, buffSize, buffStartPosition);
+                            buffSize = parseBuff(buff, buffSize, buffStartPosition,specialCharPosition);
+                        }else{
+                            //clean buffSize
+                            buffSize=0;
                         }
 
                         boolean incrPosition = false;
@@ -219,7 +226,7 @@ public class PinyinTokenizer extends Tokenizer {
 
                 //clean previous temp
                 if (buff.length() > 0) {
-                    buffSize = parseBuff(buff, buffSize, buffStartPosition);
+                    buffSize = parseBuff(buff, buffSize, buffStartPosition,specialCharPosition);
                 }
             }
 
@@ -270,7 +277,7 @@ public class PinyinTokenizer extends Tokenizer {
         return false;
     }
 
-    private int parseBuff(StringBuilder buff, int buffSize, int buffPosition) {
+    private int parseBuff(StringBuilder buff, int buffSize, int buffPosition,int[] specialCharPosition) {
         if (config.keepNoneChinese) {
             if (config.noneChinesePinyinTokenize) {
                 List<String> result = PinyinAlphabetTokenizer.walk(buff.toString());
@@ -278,6 +285,10 @@ public class PinyinTokenizer extends Tokenizer {
                 for (int i = 0; i < result.size(); i++) {
                     int end;
                     String t = result.get(i);
+                    //skip special charset
+                    if(specialCharPosition[start]==1){
+                        ++start;
+                    }
                     if (config.fixedPinyinOffset) {
                         end = start + 1;
                     } else {
