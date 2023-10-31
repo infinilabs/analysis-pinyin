@@ -27,6 +27,9 @@ This Pinyin Analysis plugin is used to do conversion between Chinese characters 
     | 1.2.2                         | 1.0.x          |
     --------------------------------------------------
 
+> If some version was not released in time, instead of request version by raising issue, please kindly reach out by join this discord channel( [https://discord.gg/NtZgghfW](https://discord.gg/NtZgghfW)).
+
+
 The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:  `pinyin`.
 
 ** Optional Parameters ** 
@@ -376,3 +379,7 @@ GET /medcl3/_search
 </pre>
 
 8.That's all, have fun.
+
+# Community
+
+[https://discord.gg/NtZgghfW](https://discord.gg/NtZgghfW)
