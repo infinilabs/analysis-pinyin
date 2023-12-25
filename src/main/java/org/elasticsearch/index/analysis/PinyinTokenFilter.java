@@ -142,7 +142,7 @@ public class PinyinTokenFilter extends TokenFilter {
                     if (pinyin != null && pinyin.length() > 0) {
                         position++;
                         firstLetters.append(pinyin.charAt(0));
-                        if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
+                        if (config.keepSeparateFirstLetter && pinyin.length() > 1) {
                             addCandidate(new TermItem(String.valueOf(pinyin.charAt(0)), i, i + 1, position));
                         }
                         if (config.keepFullPinyin) {
