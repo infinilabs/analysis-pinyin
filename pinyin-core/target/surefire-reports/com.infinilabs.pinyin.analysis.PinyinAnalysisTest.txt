@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.infinilabs.pinyin.analysis.PinyinAnalysisTest
--------------------------------------------------------------------------------
-Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.197 sec - in com.infinilabs.pinyin.analysis.PinyinAnalysisTest

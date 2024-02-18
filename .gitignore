@@ -10,3 +10,4 @@
 /.classpath
 /*.ipr
 /*.iws
+/*/target

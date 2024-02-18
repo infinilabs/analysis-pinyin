@@ -1,6 +1,0 @@
-com/infinilabs/opensearch/analysis/AnalysisPinyinPlugin.class
-com/infinilabs/opensearch/analysis/PinyinAbbreviationsTokenizerFactory.class
-com/infinilabs/opensearch/analysis/PinyinTokenFilterFactory.class
-com/infinilabs/opensearch/analysis/PinyinAnalyzerProvider.class
-com/infinilabs/opensearch/analysis/ESPinyinConfig.class
-com/infinilabs/opensearch/analysis/PinyinTokenizerFactory.class

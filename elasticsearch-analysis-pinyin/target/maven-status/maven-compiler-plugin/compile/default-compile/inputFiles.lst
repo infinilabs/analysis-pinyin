@@ -1,6 +1,0 @@
-/Users/zhanglei/infini/analysis-pinyin/elasticsearch-analysis-pinyin/src/main/java/com/infinilabs/elasticsearch/analysis/PinyinAnalyzerProvider.java
-/Users/zhanglei/infini/analysis-pinyin/elasticsearch-analysis-pinyin/src/main/java/com/infinilabs/elasticsearch/analysis/PinyinAbbreviationsTokenizerFactory.java
-/Users/zhanglei/infini/analysis-pinyin/elasticsearch-analysis-pinyin/src/main/java/com/infinilabs/elasticsearch/analysis/PinyinTokenizerFactory.java
-/Users/zhanglei/infini/analysis-pinyin/elasticsearch-analysis-pinyin/src/main/java/com/infinilabs/elasticsearch/analysis/PinyinTokenFilterFactory.java
-/Users/zhanglei/infini/analysis-pinyin/elasticsearch-analysis-pinyin/src/main/java/com/infinilabs/elasticsearch/analysis/ESPinyinConfig.java
-/Users/zhanglei/infini/analysis-pinyin/elasticsearch-analysis-pinyin/src/main/java/com/infinilabs/elasticsearch/analysis/AnalysisPinyinPlugin.java

@@ -1,6 +1,0 @@
-com/infinilabs/elasticsearch/analysis/ESPinyinConfig.class
-com/infinilabs/elasticsearch/analysis/PinyinTokenFilterFactory.class
-com/infinilabs/elasticsearch/analysis/PinyinAnalyzerProvider.class
-com/infinilabs/elasticsearch/analysis/PinyinTokenizerFactory.class
-com/infinilabs/elasticsearch/analysis/PinyinAbbreviationsTokenizerFactory.class
-com/infinilabs/elasticsearch/analysis/AnalysisPinyinPlugin.class
