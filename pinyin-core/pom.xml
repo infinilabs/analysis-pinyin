@@ -20,11 +20,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.nlpcn</groupId>
+            <groupId>com.infinilabs</groupId>
             <artifactId>nlp-lang</artifactId>
-            <version>1.7</version>
-            <systemPath>${basedir}/lib/nlp-lang-1.7.jar</systemPath>
-            <scope>system</scope>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

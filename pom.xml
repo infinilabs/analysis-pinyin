@@ -4,9 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <name>analysis-pinyin</name>
     <modules>
+        <module>nlp-lang</module>
+        <module>pinyin-core</module>
         <module>elasticsearch-analysis-pinyin</module>
         <module>opensearch-analysis-pinyin</module>
-        <module>pinyin-core</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.infinilabs</groupId>
