@@ -6,8 +6,8 @@
     <modules>
         <module>nlp-lang</module>
         <module>pinyin-core</module>
-        <module>elasticsearch-analysis-pinyin</module>
-        <module>opensearch-analysis-pinyin</module>
+        <module>elasticsearch</module>
+        <module>opensearch</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.infinilabs</groupId>

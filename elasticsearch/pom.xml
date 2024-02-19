@@ -48,7 +48,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <outputDirectory>${project.build.directory}/releases/</outputDirectory>
                     <descriptors>
-                        <descriptor>elasticsearch-analysis-pinyin/src/main/assemblies/plugin.xml</descriptor>
+                        <descriptor>elasticsearch/src/main/assemblies/plugin.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>

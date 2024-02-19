@@ -7,7 +7,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <files>
         <file>
-            <source>${project.basedir}/../elasticsearch-analysis-pinyin/src/main/resources/plugin-descriptor.properties</source>
+            <source>${project.basedir}/../opensearch/src/main/resources/plugin-descriptor.properties</source>
             <outputDirectory/>
             <filtered>true</filtered>
         </file>
@@ -18,7 +18,7 @@
             <useProjectArtifact>true</useProjectArtifact>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <excludes>
-                <exclude>org.elasticsearch:elasticsearch</exclude>
+                <exclude>org.opensearch:opensearch</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>

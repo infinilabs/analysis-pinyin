@@ -44,7 +44,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <outputDirectory>${project.build.directory}/releases/</outputDirectory>
                     <descriptors>
-                        <descriptor>opensearch-analysis-pinyin/src/main/assemblies/plugin.xml</descriptor>
+                        <descriptor>opensearch/src/main/assemblies/plugin.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
