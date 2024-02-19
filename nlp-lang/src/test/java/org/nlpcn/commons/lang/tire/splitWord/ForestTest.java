@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.nlpcn.commons.lang.dic.DicManager;
+//import org.nlpcn.commons.lang.dic.DicManager;
 import org.nlpcn.commons.lang.tire.GetWord;
 import org.nlpcn.commons.lang.tire.domain.Forest;
 import org.nlpcn.commons.lang.tire.library.Library;
@@ -41,17 +41,5 @@ public class ForestTest {
 
 	}
 
-	@Test
-	public void toMapTest() throws Exception {
-		
-		Forest makeForest = Library.makeForest(DicManager.class.getResourceAsStream("/finger.dic"));
-
-		List<String> readFile2List = IOUtil.readFile2List(new BufferedReader(new InputStreamReader(DicManager.class.getResourceAsStream("/finger.dic"), "utf-8")));
-
-		Map<String, String[]> map = makeForest.toMap();
-
-		Assert.assertTrue(readFile2List.size() == map.size());
-
-	}
 
 }

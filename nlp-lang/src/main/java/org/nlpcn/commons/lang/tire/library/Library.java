@@ -36,7 +36,6 @@ public class Library {
 	 * 传入value数组.构造树
 	 *
 	 * @param values
-	 * @param forest
 	 * @return
 	 */
 	public static Forest makeForest(List<Value> values) {
@@ -111,7 +110,7 @@ public class Library {
 	 * 删除一个词
 	 *
 	 * @param forest
-	 * @param temp
+	 * @param word
 	 */
 	public static void removeWord(Forest forest, String word) {
 		SmartForest<String[]> branch = forest;
