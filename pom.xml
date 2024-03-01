@@ -44,10 +44,10 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:medcl/elasticsearch-analysis-pinyin.git</connection>
-        <developerConnection>scm:git:git@github.com:medcl/elasticsearch-analysis-pinyin.git
+        <connection>scm:git:git@github.com:infinilabs/analysis-pinyin.git</connection>
+        <developerConnection>scm:git:git@github.com:infinilabs/analysis-pinyin.git
         </developerConnection>
-        <url>http://github.com/medcl/elasticsearch-analysis-pinyin</url>
+        <url>http://github.com/infinilabs/analysis-pinyin</url>
     </scm>
 
     <parent>
