@@ -1,38 +1,14 @@
-Pinyin Analysis for Elasticsearch
+Pinyin Analysis for Elasticsearch and OpenSearch
 ==================================
 
-This Pinyin Analysis plugin is used to do conversion between Chinese characters and Pinyin, integrates NLP tools (https://github.com/NLPchina/nlp-lang).
+![](./assets/banner.png)
 
-    --------------------------------------------------
-    | Pinyin Analysis Plugin        | Elasticsearch  |
-    --------------------------------------------------
-    | master                        | 7.x -> master  |
-    --------------------------------------------------
-    | 6.x                           | 6.x            |
-    --------------------------------------------------  
-    | 5.x                           | 5.x            |
-    --------------------------------------------------  
-    | 1.8.1                         | 2.4.1          |
-    --------------------------------------------------  
-    | 1.7.5                         | 2.3.5          |
-    --------------------------------------------------  
-    | 1.6.1                         | 2.2.1          |
-    --------------------------------------------------
-    | 1.5.0                         | 2.1.0          |
-    --------------------------------------------------
-    | 1.4.0                         | 2.0.x          |
-    --------------------------------------------------
-    | 1.3.0                         | 1.6.x          |
-    --------------------------------------------------
-    | 1.2.2                         | 1.0.x          |
-    --------------------------------------------------
-
-> If some version was not released in time, instead of request version by raising issue, please kindly reach out by join this discord channel( [https://discord.gg/NtZgghfW](https://discord.gg/NtZgghfW)).
-
+This Pinyin Analysis plugin is used to do conversion between Chinese characters and Pinyin, Support major versions of Elasticsearch and OpenSearch. Maintained & supported with ❤️ by INFINI Labs.
 
 The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:  `pinyin`.
 
-** Optional Parameters ** 
+# Optional Parameters
+
 * `keep_first_letter` when this option enabled,  eg: `刘德华`>`ldh`, default: true
 * `keep_separate_first_letter` when this option enabled, will keep first letters separately,  eg: `刘德华`>`l`,`d`,`h`, default: false, NOTE: query result maybe too fuzziness due to term too frequency
 * `limit_first_letter_length` set max length of the first_letter result, default: 16
@@ -50,6 +26,7 @@ The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:
 * `ignore_pinyin_offset` after 6.0, offset is strictly constrained, overlapped tokens are not allowed, with this parameter, overlapped token will allowed by ignore offset, please note, all position related query or highlight will become incorrect, you should use multi fields and specify different settings for different query purpose. if you need offset, please set it to false. default: true.
 
 
+# Quick Start
 
 1.Create a index with custom pinyin analyzer
 <pre>
@@ -380,6 +357,25 @@ GET /medcl3/_search
 
 8.That's all, have fun.
 
+
 # Community
 
+Fell free to join the Discord server to discuss anything around this project: 
+
 [https://discord.gg/NtZgghfW](https://discord.gg/NtZgghfW)
+
+# License
+
+Copyright ©️ INFINI Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
