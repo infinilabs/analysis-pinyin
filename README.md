@@ -3,28 +3,41 @@ Pinyin Analysis for Elasticsearch and OpenSearch
 
 ![](./assets/banner.png)
 
-This Pinyin Analysis plugin is used to do conversion between Chinese characters and Pinyin, Support major versions of Elasticsearch and OpenSearch. Maintained & supported with ❤️ by INFINI Labs.
+This Pinyin Analysis plugin facilitates the conversion between Chinese characters and Pinyin. It supports major versions of Elasticsearch and OpenSearch. Maintained and supported with ❤️ by INFINI Labs.
 
-The plugin includes analyzer: `pinyin` ,  tokenizer: `pinyin` and  token-filter:  `pinyin`.
+The plugin comprises an analyzer named `pinyin`, a tokenizer named `pinyin`, and a token filter named `pinyin`.
 
 # Optional Parameters
 
-* `keep_first_letter` when this option enabled,  eg: `刘德华`>`ldh`, default: true
-* `keep_separate_first_letter` when this option enabled, will keep first letters separately,  eg: `刘德华`>`l`,`d`,`h`, default: false, NOTE: query result maybe too fuzziness due to term too frequency
-* `limit_first_letter_length` set max length of the first_letter result, default: 16
-* `keep_full_pinyin` when this option enabled, eg: `刘德华`> [`liu`,`de`,`hua`], default: true
-* `keep_joined_full_pinyin` when this option enabled, eg: `刘德华`> [`liudehua`], default: false
-* `keep_none_chinese` keep non chinese letter or number in result, default: true
-* `keep_none_chinese_together` keep non chinese letter together, default: true, eg: `DJ音乐家` -> `DJ`,`yin`,`yue`,`jia`, when set to `false`, eg: `DJ音乐家` -> `D`,`J`,`yin`,`yue`,`jia`, NOTE: `keep_none_chinese` should be enabled first
-* `keep_none_chinese_in_first_letter` keep non Chinese letters in first letter, eg: `刘德华AT2016`->`ldhat2016`, default: true
-* `keep_none_chinese_in_joined_full_pinyin` keep non Chinese letters in joined full pinyin, eg: `刘德华2016`->`liudehua2016`, default: false
-* `none_chinese_pinyin_tokenize` break non chinese letters into separate pinyin term if they are pinyin, default: true, eg: `liudehuaalibaba13zhuanghan` -> `liu`,`de`,`hua`,`a`,`li`,`ba`,`ba`,`13`,`zhuang`,`han`, NOTE:  `keep_none_chinese` and `keep_none_chinese_together` should be enabled first
-* `keep_original` when this option enabled, will keep original input as well, default: false
-* `lowercase`  lowercase non Chinese letters, default: true
-* `trim_whitespace` default: true
-* `remove_duplicated_term` when this option enabled, duplicated term will be removed to save index, eg: `de的`>`de`, default: false,  NOTE: position related query maybe influenced
-* `ignore_pinyin_offset` after 6.0, offset is strictly constrained, overlapped tokens are not allowed, with this parameter, overlapped token will allowed by ignore offset, please note, all position related query or highlight will become incorrect, you should use multi fields and specify different settings for different query purpose. if you need offset, please set it to false. default: true.
+- `keep_first_letter`: When enabled, retains only the first letter of each Chinese character. For example, `刘德华` becomes `ldh`. Default: true.
 
+- `keep_separate_first_letter`: When enabled, keeps the first letters of each Chinese character separately. For example, `刘德华` becomes `l`,`d`,`h`. Default: false. Note: This may increase query fuzziness due to term frequency.
+
+- `limit_first_letter_length`: Sets the maximum length of the first letter result. Default: 16.
+
+- `keep_full_pinyin`: When enabled, preserves the full Pinyin of each Chinese character. For example, `刘德华` becomes [`liu`,`de`,`hua`]. Default: true.
+
+- `keep_joined_full_pinyin`: When enabled, joins the full Pinyin of each Chinese character. For example, `刘德华` becomes [`liudehua`]. Default: false.
+
+- `keep_none_chinese`: Keeps non-Chinese letters or numbers in the result. Default: true.
+
+- `keep_none_chinese_together`: Keeps non-Chinese letters together. Default: true. For example, `DJ音乐家` becomes `DJ`,`yin`,`yue`,`jia`. When set to `false`, `DJ音乐家` becomes `D`,`J`,`yin`,`yue`,`jia`. Note: `keep_none_chinese` should be enabled first.
+
+- `keep_none_chinese_in_first_letter`: Keeps non-Chinese letters in the first letter. For example, `刘德华AT2016` becomes `ldhat2016`. Default: true.
+
+- `keep_none_chinese_in_joined_full_pinyin`: Keeps non-Chinese letters in joined full Pinyin. For example, `刘德华2016` becomes `liudehua2016`. Default: false.
+
+- `none_chinese_pinyin_tokenize`: Breaks non-Chinese letters into separate Pinyin terms if they are Pinyin. Default: true. For example, `liudehuaalibaba13zhuanghan` becomes `liu`,`de`,`hua`,`a`,`li`,`ba`,`ba`,`13`,`zhuang`,`han`. Note: `keep_none_chinese` and `keep_none_chinese_together` should be enabled first.
+
+- `keep_original`: When enabled, keeps the original input as well. Default: false.
+
+- `lowercase`: Lowercases non-Chinese letters. Default: true.
+
+- `trim_whitespace`: Default: true.
+
+- `remove_duplicated_term`: When enabled, removes duplicated terms to save index space. For example, `de的` becomes `de`. Default: false. Note: Position-related queries may be influenced.
+
+- `ignore_pinyin_offset`: After version 6.0, offsets are strictly constrained, and overlapped tokens are not allowed. With this parameter, overlapped tokens will be allowed by ignoring the offset. Please note, all position-related queries or highlights will become incorrect. You should use multi-fields and specify different settings for different query purposes. If you need offsets, please set it to false. Default: true.
 
 # Quick Start
 
