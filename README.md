@@ -375,7 +375,7 @@ GET /medcl3/_search
 
 Fell free to join the Discord server to discuss anything around this project: 
 
-[https://discord.gg/NtZgghfW](https://discord.gg/NtZgghfW)
+[https://discord.gg/4tKTMkkvVX](https://discord.gg/4tKTMkkvVX)
 
 # License
 
