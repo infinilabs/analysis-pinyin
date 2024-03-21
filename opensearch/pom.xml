@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <opensearch.version>2.0.1</opensearch.version>
+        <opensearch.version>2.12.0</opensearch.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <plugin.name>analysis-pinyin</plugin.name>
         <opensearch.plugin.classname>com.infinilabs.opensearch.analysis.AnalysisPinyinPlugin</opensearch.plugin.classname>
