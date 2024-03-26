@@ -3,7 +3,7 @@ Pinyin Analysis for Elasticsearch and OpenSearch
 
 ![](./assets/banner.png)
 
-This Pinyin Analysis plugin facilitates the conversion between Chinese characters and Pinyin. It supports major versions of Elasticsearch and OpenSearch. Maintained and supported with ❤️ by INFINI Labs.
+This Pinyin Analysis plugin facilitates the conversion between Chinese characters and Pinyin. It supports major versions of Elasticsearch and OpenSearch. Maintained and supported with ❤️ by [INFINI Labs](https://infinilabs.com).
 
 The plugin comprises an analyzer named `pinyin`, a tokenizer named `pinyin`, and a token filter named `pinyin`.
 
@@ -39,7 +39,30 @@ The plugin comprises an analyzer named `pinyin`, a tokenizer named `pinyin`, and
 
 - `ignore_pinyin_offset`: After version 6.0, offsets are strictly constrained, and overlapped tokens are not allowed. With this parameter, overlapped tokens will be allowed by ignoring the offset. Please note, all position-related queries or highlights will become incorrect. You should use multi-fields and specify different settings for different query purposes. If you need offsets, please set it to false. Default: true.
 
-# Quick Start
+
+# How to Install
+
+You can download the packaged plugins from here: `https://release.infinilabs.com/`, 
+
+or you can use the `plugin` cli to install the plugin like this:
+
+For Elasticsearch
+
+```
+bin/elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-pinyin/8.4.1
+```
+
+For OpenSearch
+
+```
+bin/opensearch-plugin install https://get.infini.cloud/opensearch/analysis-pinyin/2.12.0
+```
+
+
+Tips: replace your own version number related to your elasticsearch or opensearch.
+
+
+# Getting Started
 
 1.Create a index with custom pinyin analyzer
 <pre>
