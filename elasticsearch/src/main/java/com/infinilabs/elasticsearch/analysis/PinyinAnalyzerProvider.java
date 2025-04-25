@@ -9,7 +9,8 @@ import org.elasticsearch.index.analysis.AbstractIndexAnalyzerProvider;
 import org.elasticsearch.injection.api.Inject;
 
 
-/**
+/*
+ * Provider for the PinyinAnalyzer.
  */
 public class PinyinAnalyzerProvider extends AbstractIndexAnalyzerProvider<PinyinAnalyzer> {
 
@@ -18,7 +19,7 @@ public class PinyinAnalyzerProvider extends AbstractIndexAnalyzerProvider<Pinyin
 
     @Inject
     public PinyinAnalyzerProvider(IndexSettings indexSettings, Environment env, String name, Settings settings) {
-        super(name, settings);
+        super(name);
         config=new ESPinyinConfig(settings);
         analyzer = new PinyinAnalyzer(config);
     }

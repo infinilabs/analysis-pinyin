@@ -14,7 +14,7 @@
     <description>Pinyin Analysis for Elasticsearch</description>
     <packaging>jar</packaging>
     <properties>
-        <elasticsearch.version>8.16.1</elasticsearch.version>
+        <elasticsearch.version>9.0.0</elasticsearch.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <!--<elasticsearch.assembly.descriptor>${basedir}/src/main/assemblies/plugin.xml</elasticsearch.assembly.descriptor>-->
         <plugin.name>analysis-pinyin</plugin.name>

@@ -14,7 +14,7 @@ public class PinyinTokenFilterFactory extends AbstractTokenFilterFactory {
 
 
     public PinyinTokenFilterFactory(IndexSettings indexSettings, Environment environment, String name, Settings settings) {
-        super(name, settings);
+        super(name);
        config=new ESPinyinConfig(settings);
     }
 
