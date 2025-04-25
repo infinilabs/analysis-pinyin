@@ -11,7 +11,7 @@ import org.elasticsearch.index.analysis.AbstractTokenizerFactory;
 public class PinyinAbbreviationsTokenizerFactory extends AbstractTokenizerFactory {
 
     public PinyinAbbreviationsTokenizerFactory(IndexSettings indexSettings, Environment env, String name, Settings settings) {
-        super(indexSettings, settings, name);
+        super(name);
     }
 
     @Override

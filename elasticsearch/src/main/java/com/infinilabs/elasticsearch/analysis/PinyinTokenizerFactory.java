@@ -13,7 +13,7 @@ public class PinyinTokenizerFactory extends AbstractTokenizerFactory {
     private PinyinConfig config;
 
     public PinyinTokenizerFactory(IndexSettings indexSettings, Environment env, String name, Settings settings) {
-        super(indexSettings, settings, name);
+        super(name);
         config=new ESPinyinConfig(settings);
     }
 
