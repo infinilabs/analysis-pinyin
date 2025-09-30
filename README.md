@@ -2,6 +2,8 @@ Pinyin Analysis for Elasticsearch and OpenSearch
 ==================================
 
 ![](./assets/banner.png)
+[![Test](https://github.com/infinilabs/analysis-pinyin/actions/workflows/test.yml/badge.svg)](https://github.com/infinilabs/analysis-pinyin/actions/workflows/test.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE.txt)
 
 This Pinyin Analysis plugin facilitates the conversion between Chinese characters and Pinyin. It supports major versions of Elasticsearch and OpenSearch. Maintained and supported with ❤️ by [INFINI Labs](https://infinilabs.com).
 
@@ -49,7 +51,7 @@ or you can use the `plugin` cli to install the plugin like this:
 For Elasticsearch
 
 ```
-bin/elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-pinyin/8.4.1
+bin/elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-pinyin/9.1.4
 ```
 
 For OpenSearch
