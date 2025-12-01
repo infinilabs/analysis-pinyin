@@ -223,9 +223,9 @@ public class PinyinAnalysisTest {
         Assert.assertEquals("hua", pinyin.get(3));
         Assert.assertEquals("m", pinyin.get(4));
         Assert.assertEquals("ming", pinyin.get(5));
-        Assert.assertEquals("z", pinyin.get(6));
-        Assert.assertEquals("zi", pinyin.get(7));
-        Assert.assertEquals("mz", pinyin.get(8));
+        Assert.assertEquals("mz", pinyin.get(6));
+        Assert.assertEquals("z", pinyin.get(7));
+        Assert.assertEquals("zi", pinyin.get(8));
 
 
         config = new PinyinConfig();

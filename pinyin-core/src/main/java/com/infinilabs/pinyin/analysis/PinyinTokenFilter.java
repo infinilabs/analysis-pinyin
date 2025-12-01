@@ -315,6 +315,7 @@ public class PinyinTokenFilter extends TokenFilter {
         this.processedFirstLetter = false;
         this.processedFullPinyinLetter = false;
         this.processedOriginal = false;
+        this.processedSortCandidate = false;
         firstLetters.setLength(0);
         fullPinyinLetters.setLength(0);
         source = null;
