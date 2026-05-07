@@ -1525,4 +1525,29 @@ public class PinyinAnalysisTest {
 
 
     }
+
+    @Test
+    public void testSeparateFirstLetterWithSingleCharPinyin() throws IOException {
+        // 测试单字符拼音（a, e, o）的首字母不丢失
+        // "小阿哦明" 的拼音: xiao, a, o, ming
+        // 期望 keep_separate_first_letter 输出: x, a, o, m
+        String[] s = new String[]{"小阿哦明"};
+
+        PinyinConfig config = new PinyinConfig();
+        config.keepFirstLetter = false;
+        config.keepSeparateFirstLetter = true;
+        config.keepFullPinyin = false;
+        config.keepJoinedFullPinyin = false;
+        config.keepOriginal = false;
+        config.ignorePinyinOffset = false;
+
+        HashMap<String, ArrayList<TermItem>> result = getStringArrayListHashMap(s, config);
+
+        ArrayList<TermItem> re = result.get("小阿哦明");
+        Assert.assertEquals(4, re.size());
+        Assert.assertEquals("x", re.get(0).term);
+        Assert.assertEquals("a", re.get(1).term);
+        Assert.assertEquals("o", re.get(2).term);
+        Assert.assertEquals("m", re.get(3).term);
+    }
 }

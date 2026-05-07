@@ -197,7 +197,7 @@ public class PinyinTokenizer extends Tokenizer {
                         String chinese = chineseList.get(i);
                         if (pinyin != null && pinyin.length() > 0) {
                             firstLetters.append(pinyin.charAt(0));
-                            if (config.keepSeparateFirstLetter & pinyin.length() > 1) {
+                            if (config.keepSeparateFirstLetter & pinyin.length() >= 1) {
                                 position++;
                                 incrPosition = true;
                                 addCandidate(new TermItem(String.valueOf(pinyin.charAt(0)), i, i + 1, position));
